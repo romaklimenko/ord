@@ -86,6 +86,10 @@ function erAfkortetDefinition(definition) {
   return /(?:…|\.\.\.)\s*$/u.test(definition);
 }
 
+function erBundenMorfem(form) {
+  return form.startsWith("-") || form.endsWith("-");
+}
+
 async function indlæsFrekvens(file) {
   let content;
   try {
@@ -136,7 +140,8 @@ async function main() {
           pos,
         },
       ])
-      .filter(([, word]) => word.form.length > 0),
+      .filter(([, word]) => word.form.length > 0)
+      .filter(([, word]) => !erBundenMorfem(word.form)),
   );
   const synsets = new Map(
     synsetRows.map(([synsetId, definition]) => [synsetId, trimDefinition(definition ?? "")]),
