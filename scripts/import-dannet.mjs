@@ -86,8 +86,18 @@ function erAfkortetDefinition(definition) {
   return /(?:…|\.\.\.)\s*$/u.test(definition);
 }
 
-function erBundenMorfem(form) {
-  return form.startsWith("-") || form.endsWith("-");
+function erUegnetSomFlashcard(form) {
+  // Bundne morfemer: præfikser/suffikser som "anti-" eller "-agtig".
+  if (form.startsWith("-") || form.endsWith("-")) {
+    return true;
+  }
+  // DanNet bruger parenteser til at vise valgfrie ord eller varianter,
+  // fx "(alment) praktiserende læge" eller "i (går) aftes". Det er
+  // notation for ordbogen og duer ikke direkte som flashcard.
+  if (/[()]/.test(form)) {
+    return true;
+  }
+  return false;
 }
 
 async function indlæsFrekvens(file) {
@@ -141,7 +151,7 @@ async function main() {
         },
       ])
       .filter(([, word]) => word.form.length > 0)
-      .filter(([, word]) => !erBundenMorfem(word.form)),
+      .filter(([, word]) => !erUegnetSomFlashcard(word.form)),
   );
   const synsets = new Map(
     synsetRows.map(([synsetId, definition]) => [synsetId, trimDefinition(definition ?? "")]),
