@@ -112,19 +112,29 @@ Konklusion 2026-05-01:
 
 ### Frekvensliste
 
-Kilde:
+Kilder:
 
-https://korpus.dsl.dk/resources/details/freq-lemmas.html
+- https://korpus.dsl.dk/resources/details/freq-lemmas.html (2024-version, gated)
+- https://sprogteknologi.dk/dataset/10-000-mest-frekvente-lemmaer (2017-version, åben)
 
 Indhold:
 
-- 30.000 hyppigste danske lemmaer med ordklasse og frekvens.
-- Findes både med og uden proprier og numeralier.
-- Frekvensen bygger på BAKSPEJLET 2024 med tekster fra 1983 til 2024.
+- DSL's frekvensliste bygger på BAKSPEJLET-korpusset.
+- Den åbne 2017-version pakkes som `lemma-10k.zip`, men indeholder reelt `lemma-30k-2017.txt` med 299.999 rækker (POS, lemma, relativ frekvens, tabsepareret).
+- 2024-versionen findes på korpus.dsl.dk, men kræver manuel accept af brugsbetingelser før download. Vi bruger den åbne 2017-version i MVP.
+- Licens: DSL Åben Licens.
+
+Lokal inspektion 2026-05-01:
+
+- Hentede `lemma-10k.zip` fra `https://korpus.dsl.dk/download/lemma-10k.zip` til `C:\tmp\ord-dsl\freq`.
+- 60.172 af 67.124 DanNet-kort matcher en lemma i listen (ca. 90 %).
+- De resterende 6.952 kort er typisk sammensætninger eller bundne morfemer som `-agtig` og bliver behandlet som lavfrekvente.
 
 Anvendelse:
 
-- God kandidat til at vælge startord og prioritere ord efter frekvens.
+- Importen joinrer DanNet-kort med frekvenslisten via lemma (lowercase). Hvis et lemma har flere POS-rækker, vælges den højeste frekvens.
+- Hvert kort får et `frekvens`-felt med den relative korpusfrekvens (eller udelades, hvis lemma ikke findes i listen).
+- Kortvalget i træneren bruger en frekvensvægtet sampling med et lille fælles gulv, så almindelige ord dominerer, men sjældne ord stadig blandes ind. Gulvet er valgt så ord uden korpusrang tilsammen får ca. 25 % af sandsynlighedsmassen.
 
 ### DDO-lemmaliste
 

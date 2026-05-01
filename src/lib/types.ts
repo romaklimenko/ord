@@ -8,6 +8,7 @@ export type Kort = {
   senseId?: string;
   synsetId?: string;
   afkortet?: boolean;
+  frekvens?: number;
 };
 
 export type Korttilstand = {

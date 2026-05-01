@@ -29,6 +29,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - Foreløbigt flashcard-format er dansk opslagsord på forsiden og dansk definition på bagsiden.
 - MVP'en bruger DanNet som eneste definitionskilde for at holde import, licens og kreditering enkel.
 - Afkortede DanNet-definitioner beholdes som flashcards og markeres med `afkortet`. UI'en gør slut-`…` til et link til DanNet-synsettet, så brugeren altid kan klikke sig videre til den fulde forklaring.
+- Nye kort vælges med en frekvensvægtet sampling, der favoriserer almindelige ord, men stadig blander sjældne ord ind via et lille fælles gulv.
 - Fuld DDO-dækning kræver sandsynligvis særskilt aftale med DSL og er ikke en MVP-blokering.
 - MVP'en bygges med Next.js på Vercel.
 - Auth0 bruges til login.
@@ -59,7 +60,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - [x] Inspicer DanNet lokalt.
 - [x] Beslut at MVP bruger DanNet som primær definitionskilde.
 - [x] Beslut om MVP bruger DanNet-eksempler i første UI.
-- [ ] Byg import for DSL's frekvensliste.
+- [x] Byg import for DSL's frekvensliste og bland frekvensvægtning ind i kortvalget.
 - [ ] Byg import for DDO-lemmaliste, hvis DDO-ID'er er nyttige.
 - [ ] Byg import for DDO-fuldformsliste, hvis bøjede former skal understøttes.
 - [x] Byg import for DanNet-definitioner.

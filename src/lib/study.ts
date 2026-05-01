@@ -10,6 +10,7 @@ import type {
   StudieSnapshot,
   StudieStatistik,
 } from "@/lib/types";
+import { frekvensVægt, vægtetTilfældigt } from "@/lib/vaelg";
 
 function erDue(state: { dueAt: string } | undefined, now: Date) {
   return Boolean(state && Date.parse(state.dueAt) <= now.getTime());
@@ -19,7 +20,7 @@ function erModent(state: { intervalDays: number; seen: number } | undefined) {
   return Boolean(state && state.seen > 0 && state.intervalDays >= 21);
 }
 
-function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
+export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
   const stateMap = new Map(states.map((state) => [state.cardId, state]));
   const dueKort = katalog
     .filter((kort) => erDue(stateMap.get(kort.id), now))
@@ -35,10 +36,10 @@ function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
 
   const nyeKort = katalog.filter((kort) => !stateMap.has(kort.id));
   if (nyeKort.length > 0) {
-    return nyeKort[Math.floor(Math.random() * nyeKort.length)];
+    return vægtetTilfældigt(nyeKort, (kort) => frekvensVægt(kort.frekvens));
   }
 
-  return katalog[Math.floor(Math.random() * katalog.length)];
+  return vægtetTilfældigt(katalog, (kort) => frekvensVægt(kort.frekvens));
 }
 
 function beregnStatistik(

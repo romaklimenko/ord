@@ -4,12 +4,14 @@ import process from "node:process";
 
 const DEFAULT_SOURCE = "C:\\tmp\\ord-dsl\\dannet-csv";
 const DEFAULT_TARGET = path.join(process.cwd(), "public", "katalog", "v1");
+const DEFAULT_FREKVENS = "C:\\tmp\\ord-dsl\\freq\\lemma-30k-2017.txt";
 const SHARD_SIZE = 500;
 
 function parseArgs(argv) {
   const args = {
     source: DEFAULT_SOURCE,
     target: DEFAULT_TARGET,
+    frekvens: DEFAULT_FREKVENS,
     limit: null,
   };
 
@@ -19,6 +21,8 @@ function parseArgs(argv) {
       args.source = argv[++i];
     } else if (arg === "--target") {
       args.target = argv[++i];
+    } else if (arg === "--frekvens") {
+      args.frekvens = argv[++i];
     } else if (arg === "--limit") {
       args.limit = Number(argv[++i]);
     } else {
@@ -82,16 +86,45 @@ function erAfkortetDefinition(definition) {
   return /(?:…|\.\.\.)\s*$/u.test(definition);
 }
 
+async function indlæsFrekvens(file) {
+  let content;
+  try {
+    content = await fs.readFile(file, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      console.warn(`Frekvensfil mangler (${file}). Kort får ingen frekvens.`);
+      return new Map();
+    }
+    throw error;
+  }
+
+  const map = new Map();
+  for (const line of content.split(/\r?\n/)) {
+    if (!line) continue;
+    const parts = line.split("\t");
+    if (parts.length < 3) continue;
+    const lemma = parts[1].trim().toLowerCase();
+    const frekvens = Number(parts[2]);
+    if (!lemma || !Number.isFinite(frekvens)) continue;
+    const eksisterende = map.get(lemma);
+    if (eksisterende === undefined || frekvens > eksisterende) {
+      map.set(lemma, frekvens);
+    }
+  }
+  return map;
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const source = path.resolve(args.source);
   const target = path.resolve(args.target);
 
-  const [wordRows, senseRows, synsetRows, exampleRows] = await Promise.all([
+  const [wordRows, senseRows, synsetRows, exampleRows, frekvensMap] = await Promise.all([
     readCsv(path.join(source, "words.csv")),
     readCsv(path.join(source, "senses.csv")),
     readCsv(path.join(source, "synsets.csv")),
     readCsv(path.join(source, "examples.csv")),
+    indlæsFrekvens(path.resolve(args.frekvens)),
   ]);
 
   const words = new Map(
@@ -126,6 +159,8 @@ async function main() {
       continue;
     }
 
+    const frekvens = frekvensMap.get(word.form.toLowerCase());
+
     cards.push({
       id: senseId,
       opslagsord: word.form,
@@ -136,6 +171,7 @@ async function main() {
       senseId,
       synsetId,
       afkortet: erAfkortetDefinition(definition),
+      ...(frekvens !== undefined ? { frekvens } : {}),
     });
   }
 
@@ -155,6 +191,7 @@ async function main() {
   }
 
   const truncatedCards = limitedCards.filter((kort) => kort.afkortet).length;
+  const rangeredeCards = limitedCards.filter((kort) => typeof kort.frekvens === "number").length;
 
   const manifest = {
     version: "v1",
@@ -162,16 +199,27 @@ async function main() {
     source: "DanNet CSV",
     totalCards: limitedCards.length,
     truncatedCards,
+    rangeredeCards,
     shards,
     attribution: {
       title: "DanNet",
       license: "CC BY-SA 4.0",
       url: "https://wordnet.dk/dannet/data",
     },
+    frekvensKilde:
+      rangeredeCards > 0
+        ? {
+            title: "30.000 hyppigste danske lemmaer (2017)",
+            license: "DSL Åben Licens",
+            url: "https://sprogteknologi.dk/dataset/10-000-mest-frekvente-lemmaer",
+          }
+        : null,
   };
 
   await fs.writeFile(path.join(target, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
-  console.log(`Skrev ${limitedCards.length} kort til ${target}`);
+  console.log(
+    `Skrev ${limitedCards.length} kort til ${target} (${rangeredeCards} med frekvens, ${truncatedCards} afkortede).`,
+  );
 }
 
 main().catch((error) => {
