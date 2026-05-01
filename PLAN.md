@@ -3,8 +3,10 @@
 ## Status
 
 - [x] Flyt første sæt ideer fra `DRAFT.md` til projektets dokumentation.
+- [x] Inspicer COR.SEM og COR.SEM.EXT som mulig definitionskilde.
+- [x] Inspicer DanNet som bredere åben definitionskilde.
+- [x] Beslut lovlig kilde til betydninger i MVP.
 - [ ] Beslut endelig teknisk stack.
-- [ ] Beslut lovlig kilde til betydninger i MVP.
 - [ ] Scaffold webappen.
 - [ ] Implementer login og brugerprofiler.
 - [ ] Implementer ordvisning med afsløring via `Enter`.
@@ -17,13 +19,16 @@
 
 ## Næste anbefalede opgave
 
-Beslut den tekniske stack, før der skrives applikationskode. Det nuværende forslag er Django, PostgreSQL, serverrenderede sider, lidt JavaScript til tastaturinteraktion og Chart.js til statistik.
+Beslut den tekniske stack med DanNet som MVP-datakilde og Vercel/managed hosting som vigtig præference.
 
 ## Beslutninger
 
 - UI, Markdown og kodekommentarer skrives på dansk.
 - Chat med projektejeren kan foregå på engelsk.
 - Projektet må ikke bruge DDO-scraping uden klar licensafklaring.
+- Foreløbigt flashcard-format er dansk opslagsord på forsiden og dansk definition på bagsiden.
+- MVP'en bruger DanNet som primær definitionskilde.
+- Fuld DDO-dækning kræver sandsynligvis særskilt aftale med DSL og er ikke en MVP-blokering.
 - `PLAN.md` holdes opdateret, og færdige implementeringsopgaver markeres lukket.
 
 ## Produktkrav
@@ -39,13 +44,18 @@ Beslut den tekniske stack, før der skrives applikationskode. Det nuværende for
 
 ## Dataopgaver
 
-- [ ] Vælg MVP-format for betydninger.
-- [ ] Vurder om betydninger skal være dansk-dansk, dansk-engelsk eller begge.
+- [x] Vælg MVP-format for betydninger.
+- [x] Vurder om betydninger skal være dansk-dansk, dansk-engelsk eller begge.
+- [x] Inspicer COR.SEM og COR.SEM.EXT lokalt.
+- [x] Inspicer DanNet lokalt.
+- [x] Beslut at MVP bruger DanNet som primær definitionskilde.
+- [ ] Beslut om MVP bruger DanNet-eksempler i første UI.
 - [ ] Byg import for DSL's frekvensliste.
 - [ ] Byg import for DDO-lemmaliste, hvis DDO-ID'er er nyttige.
 - [ ] Byg import for DDO-fuldformsliste, hvis bøjede former skal understøttes.
-- [ ] Tilføj kreditering af DSL i produktet, hvis DSL-data bruges.
-- [ ] Kontakt DSL ved tvivl om brug, især hvis COR.SEM.EXT overvejes.
+- [ ] Byg import for DanNet-definitioner.
+- [ ] Tilføj kreditering af DanNet, CST/KU og DSL i produktet.
+- [ ] Kontakt DSL senere, hvis fuld DDO-dækning bliver vigtig.
 
 ## Tekniske opgaver
 

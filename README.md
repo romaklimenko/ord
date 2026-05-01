@@ -26,7 +26,9 @@ Statistikken bør på sigt ligne de vigtigste Anki-overblik: daglige svar, korre
 
 ## Data
 
-Projektet må ikke baseres på uafklaret scraping af Den Danske Ordbog. Den første datamodel bør skelne mellem:
+MVP'en bruger DanNet som primær kilde til danske definitioner. Projektet må ikke baseres på uafklaret scraping af Den Danske Ordbog.
+
+Den første datamodel bør skelne mellem:
 
 - ordlister og frekvensdata
 - bøjninger og opslag
@@ -35,17 +37,17 @@ Projektet må ikke baseres på uafklaret scraping af Den Danske Ordbog. Den før
 
 Se `DATA.md` for den aktuelle vurdering af DSL-kilder og licenser.
 
-## Foreslået teknisk retning
+## Teknisk retning
 
-Foreløbigt valg før første kode er en enkel serverrenderet webapp:
+Den tekniske stack er ikke besluttet. Næste beslutning skal tage højde for, at projektet helst skal kunne hostes billigt eller gratis på en managed platform som Vercel.
 
-- Django til login, sessioner, modeller, admin og serverlogik.
-- PostgreSQL i produktion og SQLite til lokal udvikling, hvis det ikke spærrer for senere migration.
-- HTMX eller lidt almindelig JavaScript til tastaturflowet.
-- Chart.js til statistik.
-- Docker Compose til lokal database, når PostgreSQL bliver nødvendigt.
+Foreløbige krav til stacken:
 
-Denne retning prioriterer lav kompleksitet, billig hosting og stabil multi-user persistence frem for en tung frontend-stack.
+- login og flere brugere
+- persistent repetitionstilstand pr. bruger og ord
+- import af DanNet-data
+- enkel drift på `ord.klimenko.dk`
+- lav eller ingen fast hostingudgift
 
 ## Hosting
 
@@ -53,4 +55,4 @@ Den offentlige instans forventes at ligge på:
 
 `https://ord.klimenko.dk`
 
-Hostingmodellen er ikke besluttet. En billig VPS eller en lille PaaS med PostgreSQL er sandsynlige kandidater.
+Hostingmodellen er ikke besluttet. Vercel eller en tilsvarende managed platform er den foretrukne retning, hvis database og auth kan holdes enkle og billige.
