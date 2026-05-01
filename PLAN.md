@@ -19,7 +19,7 @@
 
 ## Næste anbefalede opgave
 
-Vælg production-strategi for DanNet-kataloget: committe genererede shards, generere dem i CI/Vercel build eller publicere dem som separat artifact.
+Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt production-miljøvariablerne.
 
 ## Beslutninger
 
@@ -36,6 +36,7 @@ Vælg production-strategi for DanNet-kataloget: committe genererede shards, gene
 - Lokal udvikling bruger først en rigtig Azure Storage-konto med separat dev-konfiguration; Azurite er kun en mulig senere testhjælper.
 - Hvis Azure-credentials mangler lokalt, bruger appen en ignoreret filbaseret fallback i `.ord-dev/progress.json`.
 - DanNet-eksempler importeres og vises som sekundær detalje, når de findes.
+- Production genererer DanNet-kataloget i Vercel build med `ORD_IMPORT_DANNET=true`.
 - `PLAN.md` holdes opdateret, og færdige implementeringsopgaver markeres lukket.
 
 ## Produktkrav

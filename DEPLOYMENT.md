@@ -18,6 +18,7 @@ Følgende miljøvariabler skal sættes i Vercel:
 ```text
 APP_BASE_URL=https://ord.klimenko.dk
 ORD_STORAGE_MODE=azure
+ORD_IMPORT_DANNET=true
 AZURE_TABLE_NAME=OrdUserData
 AZURE_STORAGE_CONNECTION_STRING=<storage-connection-string>
 AUTH0_SECRET=<32-byte-secret>
@@ -69,10 +70,13 @@ npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv
 
 Det genererede katalog ligger i `public/katalog/v1` og er ignoreret i git. Hvis kataloget mangler, bruger appen et lille udviklingskatalog.
 
-Før production-deployment skal projektet vælge én af disse strategier:
+I production er den valgte strategi at generere kataloget i Vercel build. Sæt:
 
-- committe de genererede katalog-shards med tydelig CC BY-SA 4.0-kreditering
-- generere kataloget i CI/Vercel build fra en downloadet DanNet-eksport
-- publicere kataloget som separat statisk artifact og hente det i build eller runtime
+```text
+ORD_IMPORT_DANNET=true
+ORD_DANNET_URL=https://wordnet.dk/export/csv/dn
+```
+
+Buildscriptet downloader DanNet CSV-eksporten, udpakker den i `.ord-dev/dannet-csv` og genererer `public/katalog/v1`, hvis kataloget ikke allerede findes.
 
 Den første lokalt genererede version er ca. 19 MB og indeholder 67.124 flashcard-kandidater.
