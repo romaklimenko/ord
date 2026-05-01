@@ -38,6 +38,8 @@ function nyligeOpslagsord(katalog: Kort[], states: Korttilstand[], now: Date): S
 
 export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
   const stateMap = new Map(states.map((state) => [state.cardId, state]));
+  const nylige = nyligeOpslagsord(katalog, states, now);
+
   const dueKort = katalog
     .filter((kort) => erDue(stateMap.get(kort.id), now))
     .sort((a, b) => {
@@ -46,11 +48,11 @@ export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
       return aDue - bDue;
     });
 
-  if (dueKort[0]) {
-    return dueKort[0];
+  if (dueKort.length > 0) {
+    const friskDue = dueKort.find((kort) => !nylige.has(kort.opslagsord.toLowerCase()));
+    return friskDue ?? dueKort[0];
   }
 
-  const nylige = nyligeOpslagsord(katalog, states, now);
   const nyeKort = katalog.filter((kort) => !stateMap.has(kort.id));
 
   if (nyeKort.length > 0) {

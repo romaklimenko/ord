@@ -14,13 +14,17 @@ function kort(id: string, opslagsord: string, frekvens?: number): Kort {
   };
 }
 
-function tilstand(cardId: string, lastReviewedAt: string): Korttilstand {
+function tilstand(
+  cardId: string,
+  lastReviewedAt: string,
+  options: { dueAt?: string } = {},
+): Korttilstand {
   return {
     cardId,
     repetitions: 0,
     easeFactor: 2.5,
     intervalDays: 0,
-    dueAt: "2099-01-01T00:00:00.000Z",
+    dueAt: options.dueAt ?? "2099-01-01T00:00:00.000Z",
     lastReviewedAt,
     seen: 1,
     correct: 0,
@@ -57,6 +61,35 @@ describe("vælgKort", () => {
 
     const valg = vælgKort(katalog, states, now);
     expect(valg.opslagsord).toBe("være");
+  });
+
+  it("foretrækker due-kort hvis opslagsord ikke er nyligt set", () => {
+    const now = new Date("2026-05-01T10:00:00.000Z");
+    const katalog = [kort("a1", "være"), kort("a2", "være"), kort("b1", "have")];
+    const states = [
+      // a1 lige gennemset → opslagsord "være" er nyligt
+      tilstand("a1", "2026-05-01T09:59:30.000Z", { dueAt: "2026-04-30T00:00:00.000Z" }),
+      // a2 og b1 er begge due, men a2 deler opslagsord med a1
+      tilstand("a2", "2026-04-30T00:00:00.000Z", { dueAt: "2026-04-30T00:00:00.000Z" }),
+      tilstand("b1", "2026-04-30T00:00:00.000Z", { dueAt: "2026-04-30T05:00:00.000Z" }),
+    ];
+
+    const valg = vælgKort(katalog, states, now);
+    expect(valg.id).toBe("b1");
+  });
+
+  it("falder tilbage til mest-due hvis alle due-kort er nylige", () => {
+    const now = new Date("2026-05-01T10:00:00.000Z");
+    const katalog = [kort("a1", "være"), kort("a2", "være")];
+    const states = [
+      // Begge er due, og begge har samme opslagsord, så nylig-filteret
+      // tømmer kandidatpuljen. Vi skal ramme mest-due (tidligst dueAt).
+      tilstand("a1", "2026-05-01T09:59:30.000Z", { dueAt: "2026-04-30T00:00:00.000Z" }),
+      tilstand("a2", "2026-05-01T09:59:45.000Z", { dueAt: "2026-04-30T05:00:00.000Z" }),
+    ];
+
+    const valg = vælgKort(katalog, states, now);
+    expect(valg.id).toBe("a1");
   });
 
   it("ignorerer reviews ældre end nylig-vinduet", () => {
