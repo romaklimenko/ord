@@ -65,7 +65,7 @@ Storage keys må kun ligge i servermiljøet. Browseren må ikke få direkte skri
 Lokalt genereres kataloget med:
 
 ```powershell
-npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv
+npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv --frekvens C:\tmp\ord-dsl\freq\lemma-30k-2017.txt
 ```
 
 Det genererede katalog ligger i `public/katalog/v1` og er ignoreret i git. Hvis kataloget mangler, bruger appen et lille udviklingskatalog.
@@ -75,8 +75,9 @@ I production er den valgte strategi at generere kataloget i Vercel build. Sæt:
 ```text
 ORD_IMPORT_DANNET=true
 ORD_DANNET_URL=https://wordnet.dk/export/csv/dn
+ORD_FREKVENS_URL=https://korpus.dsl.dk/download/lemma-10k.zip
 ```
 
-Buildscriptet downloader DanNet CSV-eksporten, udpakker den i `.ord-dev/dannet-csv` og genererer `public/katalog/v1`, hvis kataloget ikke allerede findes.
+Buildscriptet downloader DanNet-eksporten til `.ord-dev/dannet-csv` og DSL's åbne frekvensliste til `.ord-dev/freq`, og genererer `public/katalog/v1`, hvis kataloget ikke allerede findes. Hvis frekvenslisten ikke kan hentes, bygges kataloget uden frekvens, så build ikke fejler.
 
-Importen filtrerer afkortede definitioner væk som standard, så appen ikke viser flashcards med forklaringer der stopper ved `…`.
+Importen beholder afkortede definitioner og markerer dem med et `afkortet`-flag. UI'en gør slut-`…` til et link til DanNet-synsettet, så brugeren kan klikke videre til den fulde forklaring.
