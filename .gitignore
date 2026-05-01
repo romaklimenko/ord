@@ -3,6 +3,7 @@ DRAFT.md
 .env.*
 !.env.example
 .next/
+next-env.d.ts
 node_modules/
 public/katalog/v1/
 .ord-dev/
