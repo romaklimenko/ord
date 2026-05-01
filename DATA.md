@@ -73,6 +73,7 @@ Anvendelse:
 - Mindre komplet end fuld DDO, især for nyere, slangprægede eller mere farverige opslagsord.
 - Appen skal vise klar kreditering og håndtere CC BY-SA-forpligtelser, hvis DanNet-data distribueres eller bearbejdes.
 - DanNet er nok til at fortsætte med arkitektur og implementering.
+- Importen skal i første version generere statiske, versionerede JSON-shards til webappen i stedet for at lægge ordkataloget i Azure Table Storage.
 
 ### Frekvensliste
 
@@ -206,6 +207,6 @@ Praktisk konsekvens:
 
 - Skal MVP'en importere DanNet-eksempler, eller kun definitioner?
 - Skal repoet indeholde en lille DanNet-baseret testfixture, og hvordan skal den krediteres?
-- Skal repoet indeholde datafiler, eller skal de downloades i et separat importtrin?
+- Skal repoet indeholde genererede katalog-shards, eller skal de bygges fra downloadede DanNet-filer i et separat importtrin?
 - Skal appen vise link til DDO for hvert ord i stedet for at kopiere forklaringer?
 - Skal DSL kontaktes senere for at undersøge fuld DDO-dækning?

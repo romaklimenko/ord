@@ -6,7 +6,7 @@
 - [x] Inspicer COR.SEM og COR.SEM.EXT som mulig definitionskilde.
 - [x] Inspicer DanNet som bredere åben definitionskilde.
 - [x] Beslut lovlig kilde til betydninger i MVP.
-- [ ] Beslut endelig teknisk stack.
+- [x] Beslut endelig teknisk stack.
 - [ ] Scaffold webappen.
 - [ ] Implementer login og brugerprofiler.
 - [ ] Implementer ordvisning med afsløring via `Enter`.
@@ -19,7 +19,7 @@
 
 ## Næste anbefalede opgave
 
-Beslut den tekniske stack med DanNet som MVP-datakilde og Vercel/managed hosting som vigtig præference.
+Scaffold Next.js-webappen med Vercel som deploymentmål og plads til Auth0, statisk DanNet-katalog og Azure Table Storage.
 
 ## Beslutninger
 
@@ -29,6 +29,11 @@ Beslut den tekniske stack med DanNet som MVP-datakilde og Vercel/managed hosting
 - Foreløbigt flashcard-format er dansk opslagsord på forsiden og dansk definition på bagsiden.
 - MVP'en bruger DanNet som primær definitionskilde.
 - Fuld DDO-dækning kræver sandsynligvis særskilt aftale med DSL og er ikke en MVP-blokering.
+- MVP'en bygges med Next.js på Vercel.
+- Auth0 bruges til login.
+- Orddata lagres som genererede statiske JSON-shards, ikke i database eller blob storage.
+- Brugerprogression lagres i Azure Table Storage.
+- Lokal udvikling bruger først en rigtig Azure Storage-konto med separat dev-konfiguration; Azurite er kun en mulig senere testhjælper.
 - `PLAN.md` holdes opdateret, og færdige implementeringsopgaver markeres lukket.
 
 ## Produktkrav
@@ -59,9 +64,12 @@ Beslut den tekniske stack med DanNet som MVP-datakilde og Vercel/managed hosting
 
 ## Tekniske opgaver
 
-- [ ] Opret applikationsstruktur.
-- [ ] Opret datamodel for brugere, ord, kort, svarhistorik og repetitionstilstand.
+- [ ] Opret Next.js-applikationsstruktur.
+- [ ] Opret Auth0-konfiguration og loginflow.
+- [ ] Opret Azure Table Storage-klient til serverkode.
+- [ ] Opret datamodel for brugerprofil, korttilstand, repetitionskø, svarhistorik og daglige statistikaggregater.
 - [ ] Opret seed- eller importkommando til lovlige orddata.
+- [ ] Generer versionerede statiske DanNet JSON-shards.
 - [ ] Opret træningsside med tastaturstyring.
 - [ ] Opret statistikside.
 - [ ] Tilføj tests for SM-2-planlægning.

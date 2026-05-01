@@ -39,15 +39,20 @@ Se `DATA.md` for den aktuelle vurdering af DSL-kilder og licenser.
 
 ## Teknisk retning
 
-Den tekniske stack er ikke besluttet. Næste beslutning skal tage højde for, at projektet helst skal kunne hostes billigt eller gratis på en managed platform som Vercel.
+MVP'en bygges som en managed webapp med:
 
-Foreløbige krav til stacken:
+- Next.js på Vercel
+- Auth0 til login
+- DanNet-katalog som genererede statiske JSON-shards
+- Azure Table Storage til brugerprogression, repetitionskø, svarhistorik og statistikaggregater
 
-- login og flere brugere
-- persistent repetitionstilstand pr. bruger og ord
-- import af DanNet-data
-- enkel drift på `ord.klimenko.dk`
-- lav eller ingen fast hostingudgift
+Orddata er næsten statiske og skal derfor ikke ligge i en database i første version. Importen skal generere et versioneret katalog, som Vercel kan servere som statiske filer. Brugerdata er små, nøglebaserede og kan gemmes i Azure Table Storage med én partition pr. bruger.
+
+Serverkald til Azure Storage skal gå gennem Next.js' Node.js-runtime. Browseren må ikke have direkte adgang til storage keys eller skrive-SAS'er. Edge-runtime er ikke et krav for MVP'en.
+
+Lokal udvikling bruger som udgangspunkt en rigtig Azure Storage-konto med et separat dev-miljø. Azurite kan tilføjes senere til automatiserede integrationstests, men er ikke en del af standardopsætningen.
+
+Hvis appen senere får behov for tunge adminforespørgsler, globale søgninger i brugerdata eller mere avanceret analyse, kan Azure Table Storage udskiftes med Postgres uden at ændre ordkatalogets statiske model.
 
 ## Hosting
 
@@ -55,4 +60,4 @@ Den offentlige instans forventes at ligge på:
 
 `https://ord.klimenko.dk`
 
-Hostingmodellen er ikke besluttet. Vercel eller en tilsvarende managed platform er den foretrukne retning, hvis database og auth kan holdes enkle og billige.
+Hostingmodellen er Vercel med `ord.klimenko.dk` som custom domain.
