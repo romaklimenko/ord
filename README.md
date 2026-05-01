@@ -67,10 +67,12 @@ Udfyld `.env.local` efter behov. Uden Auth0- og Azure-credentials bruger appen e
 Generer lokalt DanNet-katalog fra den downloadede CSV-eksport:
 
 ```powershell
-npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv
+npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv --frekvens C:\tmp\ord-dsl\freq\lemma-30k-2017.txt
 ```
 
-Kataloget skrives til `public/katalog/v1`, som ikke committes. Importen filtrerer afkortede definitioner væk som standard. Hvis kataloget mangler, bruger appen et lille indbygget udviklingskatalog.
+Kataloget skrives til `public/katalog/v1`, som ikke committes. Importen beholder afkortede definitioner og markerer dem med et `afkortet`-flag. Hvis kataloget mangler, bruger appen et lille indbygget udviklingskatalog.
+
+Frekvensfilen kan hentes på forhånd fra `https://korpus.dsl.dk/download/lemma-10k.zip` (filen indeholder 30.000-listen). Hvis `--frekvens` udelades, bygges kataloget uden frekvens, og kortvalget bliver uniformt tilfældigt for nye kort.
 
 Start appen:
 
