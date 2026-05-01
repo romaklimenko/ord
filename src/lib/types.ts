@@ -7,6 +7,7 @@ export type Kort = {
   kilde: "DanNet";
   senseId?: string;
   synsetId?: string;
+  afkortet?: boolean;
 };
 
 export type Korttilstand = {

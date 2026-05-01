@@ -112,7 +112,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
           {vist ? (
             <div className={styles.definition}>
-              <p>{kort.definition}</p>
+              <p>{renderDefinition(kort)}</p>
               {kort.eksempler.length > 0 ? (
                 <ul>
                   {kort.eksempler.slice(0, 2).map((eksempel) => (
@@ -186,6 +186,52 @@ function oversætOrdklasse(ordklasse: string) {
   };
 
   return map[ordklasse] ?? ordklasse;
+}
+
+const afkortetSluttegn = /([…]|\.\.\.)\s*$/u;
+
+function renderDefinition(kort: import("@/lib/types").Kort) {
+  if (!kort.afkortet) {
+    return kort.definition;
+  }
+
+  const match = afkortetSluttegn.exec(kort.definition);
+  if (!match) {
+    return kort.definition;
+  }
+
+  const startIndeks = match.index;
+  const indledning = kort.definition.slice(0, startIndeks);
+  const url = kildeUrl(kort);
+
+  if (!url) {
+    return kort.definition;
+  }
+
+  return (
+    <>
+      {indledning}
+      <a
+        className={styles.afkortet}
+        href={url}
+        rel="noreferrer"
+        target="_blank"
+        title="Se fuld forklaring hos kilden"
+      >
+        …
+      </a>
+    </>
+  );
+}
+
+function kildeUrl(kort: import("@/lib/types").Kort) {
+  if (kort.synsetId) {
+    return `https://wordnet.dk/dannet/data/${encodeURIComponent(kort.synsetId)}`;
+  }
+  if (kort.opslagsord) {
+    return `https://ordnet.dk/ddo/ordbog?query=${encodeURIComponent(kort.opslagsord)}`;
+  }
+  return null;
 }
 
 function beregnOrdStørrelse(ord: string) {

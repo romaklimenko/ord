@@ -77,6 +77,39 @@ Anvendelse:
 - Importscriptet filtrerer som standard afkortede definitioner væk, så flashcards ikke ender med en forklaring, der stopper ved `…`.
 - Efter filtrering af afkortede definitioner genererer den lokale import 25.320 flashcard-kandidater og springer 41.804 DanNet-sansrækker over.
 
+### Afkortede DanNet-definitioner og suppleringskilder
+
+Lokal inspektion 2026-05-01:
+
+- DanNet-importen har 67.124 mulige sansrækker efter kobling mellem ord, sanser og synsets.
+- 25.320 sansrækker har komplette definitioner.
+- 41.804 sansrækker har en definition, der slutter med ellipsetegn (~50 tegn før `…`).
+- De afkortede rækker berører 33.590 unikke ordformer.
+- 28.774 ordformer findes kun i DanNet med afkortet definition.
+
+Rodårsag for afkortningen:
+
+- Afkortningen er ikke et eksportfænomen. CSV, RDF/Turtle og WN-LMF XML har præcis samme afkortning ved ~50 tegn.
+- DanNet-vedligeholderen bekræfter i [issue #137](https://github.com/kuhumcst/DanNet/issues/137), at afkortningen er en licensbetingelse fra DSL: DanNet må ikke offentliggøre fulde DDO-definitioner. Den fulde tekst findes kun bag ordnet.dk, som vi ikke må scrape.
+- Ingen eksportformat eller alternativ kanal omgår begrænsningen uden særskilt aftale med DSL.
+
+Vurderede suppleringskilder:
+
+- COR.SEM.EXT bygger på samme DDO-kilde og har samme afkortning. Filtreres alle ellipsetegn fra, kan kilden kun supplere 3.292 af de 28.774 helt manglende ordformer. Licensen CC BY-NC-ND gør den også juridisk strammere end DanNet.
+- Kaikki/Wiktextract for dansk dækker 7.214 helt manglende ordformer, men glosser er engelske og passer ikke til dansk-dansk MVP.
+- Dansk Wiktionary-dumpet har danske forklaringer for 3.907 helt manglende ordformer, men parsing er ujævn, og mange opslag er meget korte.
+- Wikidata danske leksemer (CC0) overlapper i høj grad med DanNet og giver ikke nogen reel netto-gevinst.
+- Ordbog over det danske Sprog (ODS, 1918-1956) er offentlig på ordnet.dk, men distribueres ikke som datasæt og må ikke scrapes.
+
+Konklusion 2026-05-01:
+
+- Der findes ingen åben dansk-dansk ordbog med bedre dækning og fri tekst end DanNet under en brugbar licens.
+- Vi blander ikke andre kilder ind i MVP'en. Det holder import, kreditering og licenshåndtering enkelt.
+- Den tidligere strategi (smid alle afkortede definitioner væk) fjernede 62 % af DanNet's sansrækker og hele 28.774 ordformer fra appen.
+- Ny strategi for MVP: behold alle DanNet-sansrækker i kataloget. Hvert kort får et `afkortet`-flag, og UI'en gør slut-`…` til et link til DanNet-synsettet. Synsettet linker selv videre til den fulde DDO-forklaring, så brugeren altid kan klikke sig frem til kilden.
+- DanNet leverer 44.215 eksempelrækker uden samme afkortning. De vises som sekundær detalje og giver ekstra kontekst, særligt når definitionen er forkortet.
+- Hvis fuld DDO-dækning bliver et produktkrav, er DSL-aftale stadig den eneste lovlige vej.
+
 ### Frekvensliste
 
 Kilde:

@@ -67,6 +67,29 @@ describe("Træner", () => {
     expect(screen.getByText("boble eller bule i asfaltbelægning")).toBeInTheDocument();
   });
 
+  it("viser afkortet definition med link til DanNet-synsettet", async () => {
+    const afkortetSnapshot: StudieSnapshot = {
+      kort: {
+        id: "kort-afkortet",
+        opslagsord: "magnet",
+        ordklasse: "substantiv",
+        definition: "genstand, fx et redskab el. en komponent, som fysi…",
+        eksempler: [],
+        kilde: "DanNet",
+        synsetId: "synset-12345",
+        afkortet: true,
+      },
+      statistik: førsteSnapshot.statistik,
+    };
+
+    render(<Træner bruger={bruger} førsteSnapshot={afkortetSnapshot} />);
+
+    await userEvent.keyboard("{Enter}");
+
+    const link = screen.getByRole("link", { name: "…" });
+    expect(link).toHaveAttribute("href", "https://wordnet.dk/dannet/data/synset-12345");
+  });
+
   it("sender korrekt svar med højre pil og viser næste kort", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,

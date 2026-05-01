@@ -102,6 +102,16 @@
   margin: 0;
 }
 
+.afkortet {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.afkortet:hover {
+  text-decoration: none;
+}
+
 .definition ul {
   margin: 24px 0 0;
   padding-left: 1.4em;

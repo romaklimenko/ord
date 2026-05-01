@@ -27,7 +27,8 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - Chat med projektejeren kan foregå på engelsk.
 - Projektet må ikke bruge DDO-scraping uden klar licensafklaring.
 - Foreløbigt flashcard-format er dansk opslagsord på forsiden og dansk definition på bagsiden.
-- MVP'en bruger DanNet som primær definitionskilde.
+- MVP'en bruger DanNet som eneste definitionskilde for at holde import, licens og kreditering enkel.
+- Afkortede DanNet-definitioner beholdes som flashcards og markeres med `afkortet`. UI'en gør slut-`…` til et link til DanNet-synsettet, så brugeren altid kan klikke sig videre til den fulde forklaring.
 - Fuld DDO-dækning kræver sandsynligvis særskilt aftale med DSL og er ikke en MVP-blokering.
 - MVP'en bygges med Next.js på Vercel.
 - Auth0 bruges til login.
@@ -63,6 +64,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - [ ] Byg import for DDO-fuldformsliste, hvis bøjede former skal understøttes.
 - [x] Byg import for DanNet-definitioner.
 - [x] Tilføj kreditering af DanNet, CST/KU og DSL i produktet.
+- [x] Behold afkortede DanNet-definitioner i kataloget og link slut-`…` til DanNet-synsettet.
 - [ ] Kontakt DSL senere, hvis fuld DDO-dækning bliver vigtig.
 
 ## Tekniske opgaver

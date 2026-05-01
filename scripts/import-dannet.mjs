@@ -11,7 +11,6 @@ function parseArgs(argv) {
     source: DEFAULT_SOURCE,
     target: DEFAULT_TARGET,
     limit: null,
-    includeTruncated: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -22,8 +21,6 @@ function parseArgs(argv) {
       args.target = argv[++i];
     } else if (arg === "--limit") {
       args.limit = Number(argv[++i]);
-    } else if (arg === "--include-truncated") {
-      args.includeTruncated = true;
     } else {
       throw new Error(`Ukendt argument: ${arg}`);
     }
@@ -98,13 +95,15 @@ async function main() {
   ]);
 
   const words = new Map(
-    wordRows.map(([wordId, form, pos]) => [
-      wordId,
-      {
-        form,
-        pos,
-      },
-    ]),
+    wordRows
+      .map(([wordId, form, pos]) => [
+        wordId,
+        {
+          form: (form ?? "").trim(),
+          pos,
+        },
+      ])
+      .filter(([, word]) => word.form.length > 0),
   );
   const synsets = new Map(
     synsetRows.map(([synsetId, definition]) => [synsetId, trimDefinition(definition ?? "")]),
@@ -119,17 +118,11 @@ async function main() {
   }
 
   const cards = [];
-  let skippedTruncated = 0;
   for (const [senseId, synsetId, wordId] of senseRows) {
     const word = words.get(wordId);
     const definition = synsets.get(synsetId);
 
     if (!word || !definition) {
-      continue;
-    }
-
-    if (!args.includeTruncated && erAfkortetDefinition(definition)) {
-      skippedTruncated += 1;
       continue;
     }
 
@@ -142,6 +135,7 @@ async function main() {
       kilde: "DanNet",
       senseId,
       synsetId,
+      afkortet: erAfkortetDefinition(definition),
     });
   }
 
@@ -160,12 +154,14 @@ async function main() {
     shards.push({ file, count: shardCards.length });
   }
 
+  const truncatedCards = limitedCards.filter((kort) => kort.afkortet).length;
+
   const manifest = {
     version: "v1",
     generatedAt: new Date().toISOString(),
     source: "DanNet CSV",
     totalCards: limitedCards.length,
-    skippedTruncated,
+    truncatedCards,
     shards,
     attribution: {
       title: "DanNet",
