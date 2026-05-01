@@ -79,4 +79,4 @@ ORD_DANNET_URL=https://wordnet.dk/export/csv/dn
 
 Buildscriptet downloader DanNet CSV-eksporten, udpakker den i `.ord-dev/dannet-csv` og genererer `public/katalog/v1`, hvis kataloget ikke allerede findes.
 
-Den første lokalt genererede version er ca. 19 MB og indeholder 67.124 flashcard-kandidater.
+Importen filtrerer afkortede definitioner væk som standard, så appen ikke viser flashcards med forklaringer der stopper ved `…`.

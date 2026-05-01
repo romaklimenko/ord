@@ -70,7 +70,7 @@ Generer lokalt DanNet-katalog fra den downloadede CSV-eksport:
 npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv
 ```
 
-Kataloget skrives til `public/katalog/v1`, som ikke committes. Hvis kataloget mangler, bruger appen et lille indbygget udviklingskatalog.
+Kataloget skrives til `public/katalog/v1`, som ikke committes. Importen filtrerer afkortede definitioner væk som standard. Hvis kataloget mangler, bruger appen et lille indbygget udviklingskatalog.
 
 Start appen:
 

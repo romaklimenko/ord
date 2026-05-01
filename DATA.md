@@ -74,7 +74,8 @@ Anvendelse:
 - Appen skal vise klar kreditering og håndtere CC BY-SA-forpligtelser, hvis DanNet-data distribueres eller bearbejdes.
 - DanNet er nok til at fortsætte med arkitektur og implementering.
 - Importen skal i første version generere statiske, versionerede JSON-shards til webappen i stedet for at lægge ordkataloget i Azure Table Storage.
-- Første importscript genererer lokalt 67.124 flashcard-kandidater fra DanNet CSV ved at koble ord, sanser, synsets og op til to eksempler pr. sans.
+- Importscriptet filtrerer som standard afkortede definitioner væk, så flashcards ikke ender med en forklaring, der stopper ved `…`.
+- Efter filtrering af afkortede definitioner genererer den lokale import 25.320 flashcard-kandidater og springer 41.804 DanNet-sansrækker over.
 
 ### Frekvensliste
 
