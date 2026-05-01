@@ -41,7 +41,7 @@
   position: relative;
   width: min(1400px, calc(100vw - 48px));
   margin: 0 auto;
-  padding: clamp(32px, 8vh, 86px) 0 32px;
+  padding: 76px 0 32px;
 }
 
 .dagScore {
@@ -49,13 +49,13 @@
   top: 34px;
   right: 0;
   color: var(--tekst);
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-size: 1.7rem;
   font-weight: 600;
 }
 
 .kort,
 .kortDetaljer {
-  width: min(100%, 1100px);
+  width: min(100%, 1220px);
 }
 
 .kort {
@@ -71,7 +71,7 @@
 .ordklasse {
   margin: 0 0 8px;
   color: var(--tekst);
-  font-size: clamp(1.25rem, 2vw, 1.9rem);
+  font-size: 1.75rem;
   font-style: italic;
   font-weight: 600;
 }
@@ -80,18 +80,20 @@
 .kortDetaljer h1 {
   margin: 0;
   max-width: 100%;
-  overflow-wrap: anywhere;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(4.5rem, 13vw, 12rem);
+  font-size: var(--ord-stoerrelse);
   line-height: 0.9;
   letter-spacing: 0;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  word-break: normal;
 }
 
 .definition {
   margin-top: 36px;
   padding-top: 28px;
   border-top: 1px solid var(--linje);
-  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  font-size: 1.55rem;
   line-height: 1.35;
 }
 
@@ -169,7 +171,7 @@
   gap: 24px;
   padding: 20px 28px 28px;
   color: var(--tekst);
-  font-size: clamp(1rem, 2vw, 1.55rem);
+  font-size: 1.15rem;
   font-weight: 600;
 }
 
@@ -212,6 +214,21 @@
 
   .dagScore {
     top: 16px;
+    font-size: 1.25rem;
+  }
+
+  .ordklasse {
+    font-size: 1.2rem;
+  }
+
+  .kort h1,
+  .kortDetaljer h1 {
+    font-size: min(var(--ord-stoerrelse), 4rem);
+    overflow-wrap: anywhere;
+  }
+
+  .definition {
+    font-size: 1.15rem;
   }
 
   .feedback {
@@ -221,5 +238,6 @@
   .bundlinje {
     align-items: flex-start;
     flex-direction: column;
+    font-size: 1rem;
   }
 }

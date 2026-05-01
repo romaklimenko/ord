@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import type { AktuelBruger } from "@/lib/session";
 import type { ReviewRating, StudieSnapshot } from "@/lib/types";
 import styles from "./Traener.module.css";
@@ -18,6 +19,9 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
   const [fejl, setFejl] = useState<string | null>(null);
 
   const kort = snapshot.kort;
+  const ordStil = {
+    "--ord-stoerrelse": `${beregnOrdStørrelse(kort.opslagsord)}rem`,
+  } as CSSProperties;
 
   const sendReview = useCallback(
     async (rating: ReviewRating) => {
@@ -104,7 +108,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
         <article className={vist ? styles.kortDetaljer : styles.kort}>
           <p className={styles.ordklasse}>{oversætOrdklasse(kort.ordklasse)}</p>
-          <h1>{kort.opslagsord}</h1>
+          <h1 style={ordStil}>{kort.opslagsord}</h1>
 
           {vist ? (
             <div className={styles.definition}>
@@ -182,4 +186,32 @@ function oversætOrdklasse(ordklasse: string) {
   };
 
   return map[ordklasse] ?? ordklasse;
+}
+
+function beregnOrdStørrelse(ord: string) {
+  const længsteDel = Math.max(...ord.split(/[\s-]+/u).map((del) => del.length), 1);
+  const samletLængde = ord.replace(/\s+/gu, "").length;
+  const mål = Math.max(længsteDel, Math.round(samletLængde * 0.7));
+
+  if (mål <= 6) {
+    return 9;
+  }
+
+  if (mål <= 9) {
+    return 8;
+  }
+
+  if (mål <= 13) {
+    return 6.8;
+  }
+
+  if (mål <= 17) {
+    return 5.4;
+  }
+
+  if (mål <= 23) {
+    return 4.2;
+  }
+
+  return 3.4;
 }
