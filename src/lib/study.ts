@@ -20,6 +20,22 @@ function erModent(state: { intervalDays: number; seen: number } | undefined) {
   return Boolean(state && state.seen > 0 && state.intervalDays >= 21);
 }
 
+const NYLIG_VINDUE_MS = 90_000;
+
+function nyligeOpslagsord(katalog: Kort[], states: Korttilstand[], now: Date): Set<string> {
+  const kortById = new Map(katalog.map((kort) => [kort.id, kort]));
+  const nylige = new Set<string>();
+  for (const state of states) {
+    if (!state.lastReviewedAt) continue;
+    if (now.getTime() - Date.parse(state.lastReviewedAt) > NYLIG_VINDUE_MS) continue;
+    const kort = kortById.get(state.cardId);
+    if (kort) {
+      nylige.add(kort.opslagsord.toLowerCase());
+    }
+  }
+  return nylige;
+}
+
 export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
   const stateMap = new Map(states.map((state) => [state.cardId, state]));
   const dueKort = katalog
@@ -34,12 +50,18 @@ export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
     return dueKort[0];
   }
 
+  const nylige = nyligeOpslagsord(katalog, states, now);
   const nyeKort = katalog.filter((kort) => !stateMap.has(kort.id));
+
   if (nyeKort.length > 0) {
-    return vægtetTilfældigt(nyeKort, (kort) => frekvensVægt(kort.frekvens));
+    const friske = nyeKort.filter((kort) => !nylige.has(kort.opslagsord.toLowerCase()));
+    const kandidater = friske.length > 0 ? friske : nyeKort;
+    return vægtetTilfældigt(kandidater, (kort) => frekvensVægt(kort.frekvens));
   }
 
-  return vægtetTilfældigt(katalog, (kort) => frekvensVægt(kort.frekvens));
+  const friskeKatalog = katalog.filter((kort) => !nylige.has(kort.opslagsord.toLowerCase()));
+  const fallback = friskeKatalog.length > 0 ? friskeKatalog : katalog;
+  return vægtetTilfældigt(fallback, (kort) => frekvensVægt(kort.frekvens));
 }
 
 function beregnStatistik(
