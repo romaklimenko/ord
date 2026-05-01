@@ -14,12 +14,12 @@
 - [x] Implementer SM-2-baseret repetitionsplan.
 - [x] Importer første lovlige ordliste.
 - [x] Implementer basisstatistik.
-- [ ] Implementer Anki-lignende diagrammer.
+- [x] Implementer Anki-lignende diagrammer.
 - [ ] Klargør hosting på `ord.klimenko.dk`.
 
 ## Næste anbefalede opgave
 
-Udbyg statistikvisningen med Anki-lignende diagrammer og tilføj browser-/komponenttests for hotkeys og feedbackflow.
+Tilføj deployment-dokumentation og første Vercel-konfiguration for `ord.klimenko.dk`.
 
 ## Beslutninger
 
@@ -75,5 +75,5 @@ Udbyg statistikvisningen med Anki-lignende diagrammer og tilføj browser-/kompon
 - [x] Opret træningsside med tastaturstyring.
 - [x] Opret statistikside.
 - [x] Tilføj tests for SM-2-planlægning.
-- [ ] Tilføj tests for hotkeys og feedbackflow.
+- [x] Tilføj tests for hotkeys og feedbackflow.
 - [ ] Tilføj deployment-dokumentation.

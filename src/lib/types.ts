@@ -43,4 +43,9 @@ export type StudieSnapshot = {
   statistik: StudieStatistik;
 };
 
+export type StatistikOversigt = {
+  statistik: StudieStatistik;
+  dage: DagligStatistik[];
+};
+
 export type ReviewRating = "wrong" | "correct";

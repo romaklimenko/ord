@@ -55,3 +55,92 @@
   font-size: 2rem;
   font-weight: 800;
 }
+
+.diagram {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--linje);
+}
+
+.sektionTop {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.sektionTop h2,
+.sektionTop p {
+  margin: 0;
+}
+
+.sektionTop h2 {
+  font-size: 1.4rem;
+}
+
+.sektionTop p {
+  color: var(--sekundaer-tekst);
+}
+
+.søjler {
+  display: grid;
+  grid-template-columns: repeat(30, minmax(8px, 1fr));
+  align-items: end;
+  gap: 8px;
+  height: 240px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.søjler li {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: end;
+  gap: 8px;
+  min-width: 0;
+  height: 100%;
+  text-align: center;
+  color: var(--sekundaer-tekst);
+  font-size: 0.75rem;
+}
+
+.søjle {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 100%;
+  min-height: 4px;
+  border: 1px solid var(--linje);
+  background: #fafafa;
+}
+
+.rigtige,
+.forkerte {
+  display: block;
+  width: 100%;
+}
+
+.rigtige {
+  background: var(--rigtigt);
+}
+
+.forkerte {
+  background: var(--forkert);
+}
+
+@media (max-width: 760px) {
+  .sektionTop {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .søjler {
+    gap: 4px;
+    height: 180px;
+  }
+
+  .søjler li span {
+    display: none;
+  }
+}

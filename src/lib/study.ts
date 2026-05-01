@@ -1,8 +1,15 @@
 import { hentKatalog } from "@/lib/catalog";
-import { tilDatoNøgle } from "@/lib/date";
+import { senesteDatoNøgler, tilDatoNøgle } from "@/lib/date";
 import { hentDag, hentProgressRepository } from "@/lib/progress";
 import { nyKorttilstand, planlægNæsteReview } from "@/lib/sm2";
-import type { Kort, Korttilstand, ReviewRating, StudieSnapshot, StudieStatistik } from "@/lib/types";
+import type {
+  Kort,
+  Korttilstand,
+  ReviewRating,
+  StatistikOversigt,
+  StudieSnapshot,
+  StudieStatistik,
+} from "@/lib/types";
 
 function erDue(state: { dueAt: string } | undefined, now: Date) {
   return Boolean(state && Date.parse(state.dueAt) <= now.getTime());
@@ -61,6 +68,19 @@ export async function hentStudieSnapshot(userId: string): Promise<StudieSnapshot
   return {
     kort,
     statistik: beregnStatistik(katalog, states, dag, now),
+  };
+}
+
+export async function hentStatistikOversigt(userId: string): Promise<StatistikOversigt> {
+  const now = new Date();
+  const [katalog, progress] = await Promise.all([hentKatalog(), hentProgressRepository().hent(userId)]);
+  const states = Object.values(progress.kort);
+  const dag = hentDag(progress, tilDatoNøgle(now));
+  const dage = senesteDatoNøgler(30, now).map((dato) => hentDag(progress, dato));
+
+  return {
+    statistik: beregnStatistik(katalog, states, dag, now),
+    dage,
   };
 }
 

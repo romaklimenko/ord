@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { hentAktuelBruger } from "@/lib/session";
-import { hentStudieSnapshot } from "@/lib/study";
+import { hentStatistikOversigt } from "@/lib/study";
 import styles from "./statistik.module.css";
 
 export const dynamic = "force-dynamic";
 
 export default async function StatistikSide() {
   const bruger = await hentAktuelBruger();
-  const { statistik } = await hentStudieSnapshot(bruger.id);
+  const { statistik, dage } = await hentStatistikOversigt(bruger.id);
+  const maxSvar = Math.max(1, ...dage.map((dag) => dag.svar));
 
   return (
     <main className={styles.side}>
@@ -48,6 +49,35 @@ export default async function StatistikSide() {
             <dd>{statistik.forkerteIDag}</dd>
           </div>
         </dl>
+
+        <section className={styles.diagram} aria-labelledby="daglig-aktivitet">
+          <div className={styles.sektionTop}>
+            <h2 id="daglig-aktivitet">Seneste 30 dage</h2>
+            <p>
+              {statistik.rigtigeIDag} rigtige og {statistik.forkerteIDag} forkerte i dag
+            </p>
+          </div>
+          <ol className={styles.søjler}>
+            {dage.map((dag) => {
+              const totalHeight = Math.max(4, Math.round((dag.svar / maxSvar) * 100));
+              const correctHeight = dag.svar > 0 ? Math.round((dag.rigtige / dag.svar) * totalHeight) : 0;
+              const wrongHeight = dag.svar > 0 ? totalHeight - correctHeight : 0;
+
+              return (
+                <li key={dag.dato}>
+                  <div
+                    className={styles.søjle}
+                    title={`${dag.dato}: ${dag.svar} svar, ${dag.rigtige} rigtige, ${dag.forkerte} forkerte`}
+                  >
+                    <span className={styles.rigtige} style={{ height: `${correctHeight}%` }} />
+                    <span className={styles.forkerte} style={{ height: `${wrongHeight}%` }} />
+                  </div>
+                  <span>{dag.dato.slice(6, 8)}</span>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
       </section>
     </main>
   );
