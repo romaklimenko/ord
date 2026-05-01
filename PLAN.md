@@ -19,7 +19,7 @@
 
 ## Næste anbefalede opgave
 
-Tilføj deployment-dokumentation og første Vercel-konfiguration for `ord.klimenko.dk`.
+Vælg production-strategi for DanNet-kataloget: committe genererede shards, generere dem i CI/Vercel build eller publicere dem som separat artifact.
 
 ## Beslutninger
 
@@ -76,4 +76,4 @@ Tilføj deployment-dokumentation og første Vercel-konfiguration for `ord.klimen
 - [x] Opret statistikside.
 - [x] Tilføj tests for SM-2-planlægning.
 - [x] Tilføj tests for hotkeys og feedbackflow.
-- [ ] Tilføj deployment-dokumentation.
+- [x] Tilføj deployment-dokumentation.

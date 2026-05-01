@@ -93,3 +93,5 @@ Den offentlige instans forventes at ligge på:
 `https://ord.klimenko.dk`
 
 Hostingmodellen er Vercel med `ord.klimenko.dk` som custom domain.
+
+Se `DEPLOYMENT.md` for miljøvariabler og udestående deploymentvalg.
