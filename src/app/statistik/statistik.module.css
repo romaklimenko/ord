@@ -1,0 +1,57 @@
+.side {
+  min-height: 100vh;
+  background: var(--flade);
+}
+
+.toplinje {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--linje);
+  color: var(--sekundaer-tekst);
+}
+
+.toplinje a {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--tekst);
+}
+
+.indhold {
+  width: min(960px, calc(100vw - 40px));
+  margin: 0 auto;
+  padding: 52px 0;
+}
+
+.indhold h1 {
+  margin: 0 0 32px;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  margin: 0;
+  border: 1px solid var(--linje);
+  background: var(--linje);
+}
+
+.grid div {
+  min-height: 128px;
+  padding: 20px;
+  background: var(--flade);
+}
+
+.grid dt {
+  color: var(--sekundaer-tekst);
+}
+
+.grid dd {
+  margin: 18px 0 0;
+  font-size: 2rem;
+  font-weight: 800;
+}

@@ -1,0 +1,225 @@
+.side {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  background: var(--flade);
+}
+
+.toplinje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--linje);
+  color: var(--sekundaer-tekst);
+}
+
+.logo {
+  color: var(--tekst);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 0.95rem;
+}
+
+.navigation a {
+  text-decoration: none;
+}
+
+.navigation a:hover {
+  text-decoration: underline;
+}
+
+.træner {
+  position: relative;
+  width: min(1400px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: clamp(32px, 8vh, 86px) 0 32px;
+}
+
+.dagScore {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  color: var(--tekst);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-weight: 600;
+}
+
+.kort,
+.kortDetaljer {
+  width: min(100%, 1100px);
+}
+
+.kort {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.kortDetaljer {
+  margin: 0;
+  text-align: left;
+}
+
+.ordklasse {
+  margin: 0 0 8px;
+  color: var(--tekst);
+  font-size: clamp(1.25rem, 2vw, 1.9rem);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.kort h1,
+.kortDetaljer h1 {
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(4.5rem, 13vw, 12rem);
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.definition {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--linje);
+  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  line-height: 1.35;
+}
+
+.definition p {
+  max-width: 1200px;
+  margin: 0;
+}
+
+.definition ul {
+  margin: 24px 0 0;
+  padding-left: 1.4em;
+  color: var(--sekundaer-tekst);
+  font-size: 0.9em;
+}
+
+.definition li + li {
+  margin-top: 8px;
+}
+
+.feedback {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  width: min(680px, 100%);
+  margin-top: 48px;
+}
+
+.feedback button {
+  min-height: 64px;
+  border: 1px solid var(--linje-staerk);
+  border-radius: 4px;
+  background: var(--flade);
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.feedback button:focus-visible {
+  outline: 3px solid var(--fokus);
+  outline-offset: 3px;
+}
+
+.feedback button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.forkert {
+  color: var(--forkert);
+}
+
+.forkert:hover {
+  background: var(--forkert-baggrund);
+}
+
+.rigtigt {
+  color: var(--rigtigt);
+}
+
+.rigtigt:hover {
+  background: var(--rigtigt-baggrund);
+}
+
+.fejl {
+  margin: 20px 0 0;
+  color: var(--forkert);
+  font-weight: 700;
+}
+
+.bundlinje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 20px 28px 28px;
+  color: var(--tekst);
+  font-size: clamp(1rem, 2vw, 1.55rem);
+  font-weight: 600;
+}
+
+.bundlinje a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bundlinje p {
+  margin: 0;
+}
+
+.kilde {
+  color: var(--sekundaer-tekst);
+  font-size: 0.75em;
+  font-weight: 500;
+}
+
+.bundlinje kbd {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45em;
+  padding: 0 0.32em;
+  border-radius: 4px;
+  background: var(--tekst);
+  color: var(--flade);
+  font: inherit;
+}
+
+@media (max-width: 760px) {
+  .toplinje,
+  .bundlinje {
+    padding-inline: 18px;
+  }
+
+  .træner {
+    width: min(100% - 28px, 1400px);
+    padding-top: 44px;
+  }
+
+  .dagScore {
+    top: 16px;
+  }
+
+  .feedback {
+    grid-template-columns: 1fr;
+  }
+
+  .bundlinje {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

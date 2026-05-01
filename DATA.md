@@ -74,6 +74,7 @@ Anvendelse:
 - Appen skal vise klar kreditering og håndtere CC BY-SA-forpligtelser, hvis DanNet-data distribueres eller bearbejdes.
 - DanNet er nok til at fortsætte med arkitektur og implementering.
 - Importen skal i første version generere statiske, versionerede JSON-shards til webappen i stedet for at lægge ordkataloget i Azure Table Storage.
+- Første importscript genererer lokalt 67.124 flashcard-kandidater fra DanNet CSV ved at koble ord, sanser, synsets og op til to eksempler pr. sans.
 
 ### Frekvensliste
 
@@ -205,7 +206,7 @@ Praktisk konsekvens:
 
 ## Åbne spørgsmål
 
-- Skal MVP'en importere DanNet-eksempler, eller kun definitioner?
+- Skal første UI vise DanNet-eksempler altid eller kun som sekundær detalje?
 - Skal repoet indeholde en lille DanNet-baseret testfixture, og hvordan skal den krediteres?
 - Skal repoet indeholde genererede katalog-shards, eller skal de bygges fra downloadede DanNet-filer i et separat importtrin?
 - Skal appen vise link til DDO for hvert ord i stedet for at kopiere forklaringer?

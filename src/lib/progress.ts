@@ -1,0 +1,277 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { createHash, randomUUID } from "node:crypto";
+import {
+  AzureNamedKeyCredential,
+  TableClient,
+  type TableEntityResult,
+} from "@azure/data-tables";
+import { tilDatoNøgle } from "@/lib/date";
+import type { DagligStatistik, Korttilstand, ReviewRating } from "@/lib/types";
+
+type BrugerProgress = {
+  kort: Record<string, Korttilstand>;
+  dage: Record<string, DagligStatistik>;
+};
+
+type ReviewEvent = {
+  cardId: string;
+  rating: ReviewRating;
+  reviewedAt: string;
+  nextDueAt: string;
+};
+
+type ProgressRepository = {
+  hent(userId: string): Promise<BrugerProgress>;
+  gemReview(
+    userId: string,
+    state: Korttilstand,
+    dag: DagligStatistik,
+    event: ReviewEvent,
+  ): Promise<void>;
+};
+
+type LokalDatabase = {
+  users: Record<string, BrugerProgress & { events: ReviewEvent[] }>;
+};
+
+let repository: ProgressRepository | null = null;
+
+function brugerPartition(userId: string) {
+  return `u_${createHash("sha256").update(userId).digest("hex").slice(0, 32)}`;
+}
+
+function tomProgress(): BrugerProgress {
+  return {
+    kort: {},
+    dage: {},
+  };
+}
+
+function harAzureKonfiguration() {
+  return Boolean(
+    process.env.AZURE_STORAGE_CONNECTION_STRING ||
+      (process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY),
+  );
+}
+
+function storageMode() {
+  const mode = process.env.ORD_STORAGE_MODE ?? "auto";
+  if (mode !== "auto" && mode !== "azure" && mode !== "file") {
+    throw new Error(`Ukendt ORD_STORAGE_MODE: ${mode}`);
+  }
+  return mode;
+}
+
+export function brugerAzureStorage() {
+  const mode = storageMode();
+  return mode === "azure" || (mode === "auto" && harAzureKonfiguration());
+}
+
+export function hentProgressRepository() {
+  if (repository) {
+    return repository;
+  }
+
+  if (brugerAzureStorage()) {
+    repository = new AzureProgressRepository();
+  } else {
+    repository = new FilProgressRepository();
+  }
+
+  return repository;
+}
+
+class FilProgressRepository implements ProgressRepository {
+  private fil: string;
+
+  constructor() {
+    this.fil = path.join(process.cwd(), ".ord-dev", "progress.json");
+  }
+
+  async hent(userId: string) {
+    const db = await this.læsDatabase();
+    const key = brugerPartition(userId);
+    return db.users[key] ?? tomProgress();
+  }
+
+  async gemReview(userId: string, state: Korttilstand, dag: DagligStatistik, event: ReviewEvent) {
+    const db = await this.læsDatabase();
+    const key = brugerPartition(userId);
+    const bruger = db.users[key] ?? { ...tomProgress(), events: [] };
+
+    bruger.kort[state.cardId] = state;
+    bruger.dage[dag.dato] = dag;
+    bruger.events.unshift(event);
+    bruger.events = bruger.events.slice(0, 1000);
+    db.users[key] = bruger;
+
+    await fs.mkdir(path.dirname(this.fil), { recursive: true });
+    await fs.writeFile(this.fil, `${JSON.stringify(db, null, 2)}\n`, "utf8");
+  }
+
+  private async læsDatabase(): Promise<LokalDatabase> {
+    try {
+      return JSON.parse(await fs.readFile(this.fil, "utf8")) as LokalDatabase;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        return { users: {} };
+      }
+      throw error;
+    }
+  }
+}
+
+type KortEntity = {
+  partitionKey: string;
+  rowKey: string;
+  repetitions: number;
+  easeFactor: number;
+  intervalDays: number;
+  dueAt: string;
+  lastReviewedAt?: string;
+  seen: number;
+  correct: number;
+  wrong: number;
+};
+
+type DagEntity = {
+  partitionKey: string;
+  rowKey: string;
+  svar: number;
+  rigtige: number;
+  forkerte: number;
+};
+
+class AzureProgressRepository implements ProgressRepository {
+  private client: TableClient;
+  private tableReady: Promise<void> | null = null;
+
+  constructor() {
+    const tableName = process.env.AZURE_TABLE_NAME ?? "OrdUserData";
+
+    if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
+      this.client = TableClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING, tableName);
+      return;
+    }
+
+    const account = process.env.AZURE_STORAGE_ACCOUNT;
+    const key = process.env.AZURE_STORAGE_ACCESS_KEY;
+
+    if (!account || !key) {
+      throw new Error("Azure Table Storage mangler credentials.");
+    }
+
+    const credential = new AzureNamedKeyCredential(account, key);
+    this.client = new TableClient(`https://${account}.table.core.windows.net`, tableName, credential);
+  }
+
+  async hent(userId: string) {
+    await this.sikreTabel();
+    const partitionKey = brugerPartition(userId);
+    const progress = tomProgress();
+    const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'card#' and RowKey lt 'card$'`;
+
+    for await (const entity of this.client.listEntities<KortEntity | DagEntity>({
+      queryOptions: { filter },
+    })) {
+      const rowKey = entity.rowKey ?? "";
+
+      if (rowKey.startsWith("card#")) {
+        const kort = entity as TableEntityResult<KortEntity>;
+        progress.kort[rowKey.slice("card#".length)] = {
+          cardId: rowKey.slice("card#".length),
+          repetitions: Number(kort.repetitions ?? 0),
+          easeFactor: Number(kort.easeFactor ?? 2.5),
+          intervalDays: Number(kort.intervalDays ?? 0),
+          dueAt: String(kort.dueAt),
+          lastReviewedAt: kort.lastReviewedAt ? String(kort.lastReviewedAt) : undefined,
+          seen: Number(kort.seen ?? 0),
+          correct: Number(kort.correct ?? 0),
+          wrong: Number(kort.wrong ?? 0),
+        };
+      }
+    }
+
+    const dayFilter = `PartitionKey eq '${partitionKey}' and RowKey ge 'day#' and RowKey lt 'day$'`;
+    for await (const entity of this.client.listEntities<DagEntity>({
+      queryOptions: { filter: dayFilter },
+    })) {
+      const rowKey = entity.rowKey ?? "";
+      const dato = rowKey.slice("day#".length);
+      progress.dage[dato] = {
+        dato,
+        svar: Number(entity.svar ?? 0),
+        rigtige: Number(entity.rigtige ?? 0),
+        forkerte: Number(entity.forkerte ?? 0),
+      };
+    }
+
+    return progress;
+  }
+
+  async gemReview(userId: string, state: Korttilstand, dag: DagligStatistik, event: ReviewEvent) {
+    await this.sikreTabel();
+    const partitionKey = brugerPartition(userId);
+    const reverseTicks = String(Number.MAX_SAFE_INTEGER - Date.parse(event.reviewedAt)).padStart(16, "0");
+    const eventId = randomUUID();
+
+    await this.client.upsertEntity(
+      {
+        partitionKey,
+        rowKey: `card#${state.cardId}`,
+        repetitions: state.repetitions,
+        easeFactor: state.easeFactor,
+        intervalDays: state.intervalDays,
+        dueAt: state.dueAt,
+        lastReviewedAt: state.lastReviewedAt,
+        seen: state.seen,
+        correct: state.correct,
+        wrong: state.wrong,
+      },
+      "Replace",
+    );
+
+    await this.client.upsertEntity(
+      {
+        partitionKey,
+        rowKey: `day#${dag.dato}`,
+        svar: dag.svar,
+        rigtige: dag.rigtige,
+        forkerte: dag.forkerte,
+      },
+      "Replace",
+    );
+
+    await this.client.upsertEntity(
+      {
+        partitionKey,
+        rowKey: `evt#${reverseTicks}#${event.cardId}#${eventId}`,
+        cardId: event.cardId,
+        rating: event.rating,
+        reviewedAt: event.reviewedAt,
+        nextDueAt: event.nextDueAt,
+      },
+      "Replace",
+    );
+  }
+
+  private sikreTabel() {
+    this.tableReady ??= this.client.createTable().catch((error: unknown) => {
+      const statusCode = (error as { statusCode?: number }).statusCode;
+      if (statusCode !== 409) {
+        throw error;
+      }
+    });
+    return this.tableReady;
+  }
+}
+
+export function hentDag(progress: BrugerProgress, dato = tilDatoNøgle()) {
+  return progress.dage[dato] ?? {
+    dato,
+    svar: 0,
+    rigtige: 0,
+    forkerte: 0,
+  };
+}

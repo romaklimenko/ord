@@ -7,19 +7,19 @@
 - [x] Inspicer DanNet som bredere åben definitionskilde.
 - [x] Beslut lovlig kilde til betydninger i MVP.
 - [x] Beslut endelig teknisk stack.
-- [ ] Scaffold webappen.
-- [ ] Implementer login og brugerprofiler.
-- [ ] Implementer ordvisning med afsløring via `Enter`.
-- [ ] Implementer feedbackknapper og genvejstaster.
-- [ ] Implementer SM-2-baseret repetitionsplan.
-- [ ] Importer første lovlige ordliste.
-- [ ] Implementer basisstatistik.
+- [x] Scaffold webappen.
+- [x] Implementer login og brugerprofiler.
+- [x] Implementer ordvisning med afsløring via `Enter`.
+- [x] Implementer feedbackknapper og genvejstaster.
+- [x] Implementer SM-2-baseret repetitionsplan.
+- [x] Importer første lovlige ordliste.
+- [x] Implementer basisstatistik.
 - [ ] Implementer Anki-lignende diagrammer.
 - [ ] Klargør hosting på `ord.klimenko.dk`.
 
 ## Næste anbefalede opgave
 
-Scaffold Next.js-webappen med Vercel som deploymentmål og plads til Auth0, statisk DanNet-katalog og Azure Table Storage.
+Udbyg statistikvisningen med Anki-lignende diagrammer og tilføj browser-/komponenttests for hotkeys og feedbackflow.
 
 ## Beslutninger
 
@@ -34,6 +34,8 @@ Scaffold Next.js-webappen med Vercel som deploymentmål og plads til Auth0, stat
 - Orddata lagres som genererede statiske JSON-shards, ikke i database eller blob storage.
 - Brugerprogression lagres i Azure Table Storage.
 - Lokal udvikling bruger først en rigtig Azure Storage-konto med separat dev-konfiguration; Azurite er kun en mulig senere testhjælper.
+- Hvis Azure-credentials mangler lokalt, bruger appen en ignoreret filbaseret fallback i `.ord-dev/progress.json`.
+- DanNet-eksempler importeres og vises som sekundær detalje, når de findes.
 - `PLAN.md` holdes opdateret, og færdige implementeringsopgaver markeres lukket.
 
 ## Produktkrav
@@ -54,24 +56,24 @@ Scaffold Next.js-webappen med Vercel som deploymentmål og plads til Auth0, stat
 - [x] Inspicer COR.SEM og COR.SEM.EXT lokalt.
 - [x] Inspicer DanNet lokalt.
 - [x] Beslut at MVP bruger DanNet som primær definitionskilde.
-- [ ] Beslut om MVP bruger DanNet-eksempler i første UI.
+- [x] Beslut om MVP bruger DanNet-eksempler i første UI.
 - [ ] Byg import for DSL's frekvensliste.
 - [ ] Byg import for DDO-lemmaliste, hvis DDO-ID'er er nyttige.
 - [ ] Byg import for DDO-fuldformsliste, hvis bøjede former skal understøttes.
-- [ ] Byg import for DanNet-definitioner.
-- [ ] Tilføj kreditering af DanNet, CST/KU og DSL i produktet.
+- [x] Byg import for DanNet-definitioner.
+- [x] Tilføj kreditering af DanNet, CST/KU og DSL i produktet.
 - [ ] Kontakt DSL senere, hvis fuld DDO-dækning bliver vigtig.
 
 ## Tekniske opgaver
 
-- [ ] Opret Next.js-applikationsstruktur.
-- [ ] Opret Auth0-konfiguration og loginflow.
-- [ ] Opret Azure Table Storage-klient til serverkode.
-- [ ] Opret datamodel for brugerprofil, korttilstand, repetitionskø, svarhistorik og daglige statistikaggregater.
-- [ ] Opret seed- eller importkommando til lovlige orddata.
-- [ ] Generer versionerede statiske DanNet JSON-shards.
-- [ ] Opret træningsside med tastaturstyring.
-- [ ] Opret statistikside.
-- [ ] Tilføj tests for SM-2-planlægning.
+- [x] Opret Next.js-applikationsstruktur.
+- [x] Opret Auth0-konfiguration og loginflow.
+- [x] Opret Azure Table Storage-klient til serverkode.
+- [x] Opret datamodel for brugerprofil, korttilstand, repetitionskø, svarhistorik og daglige statistikaggregater.
+- [x] Opret seed- eller importkommando til lovlige orddata.
+- [x] Generer versionerede statiske DanNet JSON-shards.
+- [x] Opret træningsside med tastaturstyring.
+- [x] Opret statistikside.
+- [x] Tilføj tests for SM-2-planlægning.
 - [ ] Tilføj tests for hotkeys og feedbackflow.
 - [ ] Tilføj deployment-dokumentation.

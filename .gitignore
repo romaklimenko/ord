@@ -1,1 +1,9 @@
 DRAFT.md
+.env
+.env.*
+!.env.example
+.next/
+node_modules/
+public/katalog/v1/
+.ord-dev/
+coverage/

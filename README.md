@@ -54,6 +54,38 @@ Lokal udvikling bruger som udgangspunkt en rigtig Azure Storage-konto med et sep
 
 Hvis appen senere får behov for tunge adminforespørgsler, globale søgninger i brugerdata eller mere avanceret analyse, kan Azure Table Storage udskiftes med Postgres uden at ændre ordkatalogets statiske model.
 
+## Lokal udvikling
+
+Installer afhængigheder:
+
+```powershell
+npm install
+```
+
+Udfyld `.env.local` efter behov. Uden Auth0- og Azure-credentials bruger appen en lokal udviklingsbruger og gemmer progression i `.ord-dev/progress.json`. Hvis `AZURE_STORAGE_CONNECTION_STRING` eller `AZURE_STORAGE_ACCOUNT`/`AZURE_STORAGE_ACCESS_KEY` sættes, bruger appen Azure Table Storage.
+
+Generer lokalt DanNet-katalog fra den downloadede CSV-eksport:
+
+```powershell
+npm run import:dannet -- --source C:\tmp\ord-dsl\dannet-csv
+```
+
+Kataloget skrives til `public/katalog/v1`, som ikke committes. Hvis kataloget mangler, bruger appen et lille indbygget udviklingskatalog.
+
+Start appen:
+
+```powershell
+npm run dev
+```
+
+Kør kvalitetstjek:
+
+```powershell
+npm run lint
+npm test
+npm run build
+```
+
 ## Hosting
 
 Den offentlige instans forventes at ligge på:
