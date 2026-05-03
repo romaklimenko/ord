@@ -74,7 +74,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - [x] Konsistent placering af opslagsordet, så det ikke hopper når kortet åbnes.
 - [x] Lad `Enter` fungere som "rigtigt" når kortet er afsløret, så streaks kan tastes som Enter-Enter-Enter.
 - [x] Skel tydeligt mellem definition og eksempler.
-- [ ] Vis altid et link til kilden, ikke kun ved afkortede definitioner.
+- [x] Vis altid et link til kilden, ikke kun ved afkortede definitioner.
 
 ## Tekniske opgaver
 

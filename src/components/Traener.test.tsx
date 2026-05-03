@@ -75,6 +75,28 @@ describe("Træner", () => {
     expect(screen.getByText("boble eller bule i asfaltbelægning")).toBeInTheDocument();
   });
 
+  it("viser kildelink også når definitionen er fuld", async () => {
+    const fuldSnapshot: StudieSnapshot = {
+      kort: {
+        id: "kort-fuld",
+        opslagsord: "asfaltboble",
+        ordklasse: "substantiv",
+        definition: "boble eller bule i asfaltbelægning",
+        eksempler: [],
+        kilde: "DanNet",
+        synsetId: "synset-99999",
+      },
+      statistik: førsteSnapshot.statistik,
+    };
+
+    render(<Træner bruger={bruger} førsteSnapshot={fuldSnapshot} />);
+
+    await userEvent.keyboard("{Enter}");
+
+    const link = screen.getByRole("link", { name: /Se hos DanNet/ });
+    expect(link).toHaveAttribute("href", "https://wordnet.dk/dannet/data/synset-99999");
+  });
+
   it("viser afkortet definition med link til DanNet-synsettet", async () => {
     const afkortetSnapshot: StudieSnapshot = {
       kort: {

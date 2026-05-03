@@ -125,6 +125,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
                   </ul>
                 </div>
               ) : null}
+              {renderKildelink(kort)}
             </div>
           ) : null}
         </article>
@@ -247,6 +248,21 @@ function kildeUrl(kort: import("@/lib/types").Kort) {
     return `https://ordnet.dk/ddo/ordbog?query=${encodeURIComponent(kort.opslagsord)}`;
   }
   return null;
+}
+
+function renderKildelink(kort: import("@/lib/types").Kort) {
+  const url = kildeUrl(kort);
+  if (!url) {
+    return null;
+  }
+  const label = kort.synsetId ? "Se hos DanNet" : "Slå op i DDO";
+  return (
+    <p className={styles.kildelink}>
+      <a href={url} rel="noreferrer" target="_blank">
+        {label} →
+      </a>
+    </p>
+  );
 }
 
 function beregnOrdStørrelse(ord: string) {

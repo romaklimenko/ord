@@ -132,6 +132,21 @@
   margin-top: 8px;
 }
 
+.kildelink {
+  margin: 28px 0 0;
+  font-size: 0.85rem;
+}
+
+.kildelink a {
+  color: var(--sekundaer-tekst);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.kildelink a:hover {
+  color: var(--tekst);
+}
+
 .afsløring {
   display: flex;
   justify-content: center;
