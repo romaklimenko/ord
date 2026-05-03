@@ -85,13 +85,14 @@
   margin-top: 36px;
   padding-top: 28px;
   border-top: 1px solid var(--linje);
-  font-size: 1.55rem;
-  line-height: 1.35;
 }
 
-.definition p {
+.forklaring {
   max-width: 1200px;
   margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+  line-height: 1.35;
 }
 
 .afkortet {
@@ -104,14 +105,30 @@
   text-decoration: none;
 }
 
-.definition ul {
-  margin: 24px 0 0;
-  padding-left: 1.4em;
+.eksempler {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--linje);
   color: var(--sekundaer-tekst);
-  font-size: 0.9em;
 }
 
-.definition li + li {
+.eksemplerLabel {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eksempler ul {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.eksempler li + li {
   margin-top: 8px;
 }
 

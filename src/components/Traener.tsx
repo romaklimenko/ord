@@ -114,13 +114,16 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
           {vist ? (
             <div className={styles.definition}>
-              <p>{renderDefinition(kort)}</p>
+              <p className={styles.forklaring}>{renderDefinition(kort)}</p>
               {kort.eksempler.length > 0 ? (
-                <ul>
-                  {kort.eksempler.slice(0, 2).map((eksempel) => (
-                    <li key={eksempel}>{eksempel}</li>
-                  ))}
-                </ul>
+                <div className={styles.eksempler}>
+                  <p className={styles.eksemplerLabel}>Eksempler</p>
+                  <ul>
+                    {kort.eksempler.slice(0, 2).map((eksempel) => (
+                      <li key={eksempel}>{eksempel}</li>
+                    ))}
+                  </ul>
+                </div>
               ) : null}
             </div>
           ) : null}
