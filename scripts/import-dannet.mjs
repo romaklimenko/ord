@@ -1,6 +1,14 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import {
+  erAfkortetDefinition,
+  erUegnetSomFlashcard,
+  indlæsFrekvens,
+  normaliserOrdklasse,
+  parseCsvLine,
+  trimDefinition,
+} from "./import-helpers.mjs";
 
 const DEFAULT_SOURCE = "C:\\tmp\\ord-dsl\\dannet-csv";
 const DEFAULT_TARGET = path.join(process.cwd(), "public", "katalog", "v1");
@@ -33,99 +41,12 @@ function parseArgs(argv) {
   return args;
 }
 
-function parseCsvLine(line) {
-  const values = [];
-  let value = "";
-  let quoted = false;
-
-  for (let i = 0; i < line.length; i += 1) {
-    const char = line[i];
-    const next = line[i + 1];
-
-    if (char === '"' && quoted && next === '"') {
-      value += '"';
-      i += 1;
-    } else if (char === '"') {
-      quoted = !quoted;
-    } else if (char === "," && !quoted) {
-      values.push(value);
-      value = "";
-    } else {
-      value += char;
-    }
-  }
-
-  values.push(value);
-  return values;
-}
-
 async function readCsv(file) {
   const content = await fs.readFile(file, "utf8");
   return content
     .split(/\r?\n/)
     .filter(Boolean)
     .map(parseCsvLine);
-}
-
-function normaliserOrdklasse(pos) {
-  const map = {
-    noun: "substantiv",
-    verb: "verbum",
-    adjective: "adjektiv",
-    adverb: "adverbium",
-  };
-
-  return map[pos] ?? pos;
-}
-
-function trimDefinition(definition) {
-  return definition.replace(/\s+/g, " ").trim();
-}
-
-function erAfkortetDefinition(definition) {
-  return /(?:…|\.\.\.)\s*$/u.test(definition);
-}
-
-function erUegnetSomFlashcard(form) {
-  // Bundne morfemer: præfikser/suffikser som "anti-" eller "-agtig".
-  if (form.startsWith("-") || form.endsWith("-")) {
-    return true;
-  }
-  // DanNet bruger parenteser til at vise valgfrie ord eller varianter,
-  // fx "(alment) praktiserende læge" eller "i (går) aftes". Det er
-  // notation for ordbogen og duer ikke direkte som flashcard.
-  if (/[()]/.test(form)) {
-    return true;
-  }
-  return false;
-}
-
-async function indlæsFrekvens(file) {
-  let content;
-  try {
-    content = await fs.readFile(file, "utf8");
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      console.warn(`Frekvensfil mangler (${file}). Kort får ingen frekvens.`);
-      return new Map();
-    }
-    throw error;
-  }
-
-  const map = new Map();
-  for (const line of content.split(/\r?\n/)) {
-    if (!line) continue;
-    const parts = line.split("\t");
-    if (parts.length < 3) continue;
-    const lemma = parts[1].trim().toLowerCase();
-    const frekvens = Number(parts[2]);
-    if (!lemma || !Number.isFinite(frekvens)) continue;
-    const eksisterende = map.get(lemma);
-    if (eksisterende === undefined || frekvens > eksisterende) {
-      map.set(lemma, frekvens);
-    }
-  }
-  return map;
 }
 
 async function main() {
