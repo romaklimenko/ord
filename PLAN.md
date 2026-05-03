@@ -68,6 +68,14 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - [x] Behold afkortede DanNet-definitioner i kataloget og link slut-`…` til DanNet-synsettet.
 - [ ] Kontakt DSL senere, hvis fuld DDO-dækning bliver vigtig.
 
+## UI-opgaver
+
+- [x] Vis svar-knap så mobile brugere uden tastatur kan afsløre kortet.
+- [ ] Konsistent placering af opslagsordet, så det ikke hopper når kortet åbnes.
+- [ ] Lad `Enter` fungere som "rigtigt" når kortet er afsløret, så streaks kan tastes som Enter-Enter-Enter.
+- [ ] Skel tydeligt mellem definition og eksempler.
+- [ ] Vis altid et link til kilden, ikke kun ved afkortede definitioner.
+
 ## Tekniske opgaver
 
 - [x] Opret Next.js-applikationsstruktur.

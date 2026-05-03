@@ -143,7 +143,17 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
               Rigtigt
             </button>
           </div>
-        ) : null}
+        ) : (
+          <div className={styles.afsløring}>
+            <button
+              type="button"
+              className={styles.visSvar}
+              onClick={() => setVist(true)}
+            >
+              Vis svar
+            </button>
+          </div>
+        )}
 
         {fejl ? <p className={styles.fejl}>{fejl}</p> : null}
       </section>

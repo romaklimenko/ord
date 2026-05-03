@@ -123,6 +123,33 @@
   margin-top: 8px;
 }
 
+.afsløring {
+  display: flex;
+  justify-content: center;
+  width: min(680px, 100%);
+  margin: 48px auto 0;
+}
+
+.visSvar {
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid var(--linje-staerk);
+  border-radius: 4px;
+  background: var(--flade);
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.visSvar:focus-visible {
+  outline: 3px solid var(--fokus);
+  outline-offset: 3px;
+}
+
+.visSvar:hover {
+  background: var(--linje);
+}
+
 .feedback {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

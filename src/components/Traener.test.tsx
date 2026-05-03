@@ -67,6 +67,14 @@ describe("Træner", () => {
     expect(screen.getByText("boble eller bule i asfaltbelægning")).toBeInTheDocument();
   });
 
+  it("afslører definitionen via Vis svar-knappen", async () => {
+    render(<Træner bruger={bruger} førsteSnapshot={førsteSnapshot} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Vis svar" }));
+
+    expect(screen.getByText("boble eller bule i asfaltbelægning")).toBeInTheDocument();
+  });
+
   it("viser afkortet definition med link til DanNet-synsettet", async () => {
     const afkortetSnapshot: StudieSnapshot = {
       kort: {
