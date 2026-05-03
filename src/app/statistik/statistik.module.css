@@ -86,7 +86,7 @@
 .søjler {
   display: grid;
   grid-template-columns: repeat(30, minmax(8px, 1fr));
-  align-items: end;
+  grid-auto-rows: 1fr;
   gap: 8px;
   height: 240px;
   margin: 0;

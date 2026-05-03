@@ -59,18 +59,19 @@ export default async function StatistikSide() {
           </div>
           <ol className={styles.søjler}>
             {dage.map((dag) => {
-              const totalHeight = Math.max(4, Math.round((dag.svar / maxSvar) * 100));
-              const correctHeight = dag.svar > 0 ? Math.round((dag.rigtige / dag.svar) * totalHeight) : 0;
-              const wrongHeight = dag.svar > 0 ? totalHeight - correctHeight : 0;
+              const søjleHøjde = Math.max(4, Math.round((dag.svar / maxSvar) * 100));
+              const rigtigeAndel = dag.svar > 0 ? Math.round((dag.rigtige / dag.svar) * 100) : 0;
+              const forkerteAndel = dag.svar > 0 ? 100 - rigtigeAndel : 0;
 
               return (
                 <li key={dag.dato}>
                   <div
                     className={styles.søjle}
+                    style={{ height: `${søjleHøjde}%` }}
                     title={`${dag.dato}: ${dag.svar} svar, ${dag.rigtige} rigtige, ${dag.forkerte} forkerte`}
                   >
-                    <span className={styles.rigtige} style={{ height: `${correctHeight}%` }} />
-                    <span className={styles.forkerte} style={{ height: `${wrongHeight}%` }} />
+                    <span className={styles.rigtige} style={{ height: `${rigtigeAndel}%` }} />
+                    <span className={styles.forkerte} style={{ height: `${forkerteAndel}%` }} />
                   </div>
                   <span>{dag.dato.slice(6, 8)}</span>
                 </li>
