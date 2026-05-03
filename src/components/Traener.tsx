@@ -64,20 +64,22 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       if (event.key === "Enter" && !vist) {
         event.preventDefault();
         setVist(true);
+        return;
       }
 
       if (!vist) {
         return;
       }
 
+      if (event.key === "Enter" || event.key === "ArrowRight" || event.key === "ArrowUp") {
+        event.preventDefault();
+        void sendReview("correct");
+        return;
+      }
+
       if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
         event.preventDefault();
         void sendReview("wrong");
-      }
-
-      if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-        event.preventDefault();
-        void sendReview("correct");
       }
     }
 
@@ -173,8 +175,8 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         <p>
           {vist ? (
             <>
-              Brug <kbd>←</kbd> eller <kbd>↓</kbd> for forkert, <kbd>→</kbd> eller <kbd>↑</kbd> for
-              rigtigt.
+              Brug <kbd>←</kbd> eller <kbd>↓</kbd> for forkert, <kbd>→</kbd>, <kbd>↑</kbd> eller{" "}
+              <kbd>Enter</kbd> for rigtigt.
             </>
           ) : (
             <>

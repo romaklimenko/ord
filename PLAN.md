@@ -47,7 +47,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 - Brugeren får vist et dansk ord.
 - Brugeren kan afsløre betydningen med `Enter`.
 - Brugeren kan markere svaret forkert med rød knap, `ArrowLeft` eller `ArrowDown`.
-- Brugeren kan markere svaret korrekt med grøn knap, `ArrowRight` eller `ArrowUp`.
+- Brugeren kan markere svaret korrekt med grøn knap, `ArrowRight`, `ArrowUp` eller `Enter` (når kortet er afsløret).
 - Appen gemmer brugerens progression pr. ord.
 - Appen vælger ord med en Anki-lignende SM-2-plan.
 - Appen viser statistik og diagrammer, der minder om Anki.
@@ -72,7 +72,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 
 - [x] Vis svar-knap så mobile brugere uden tastatur kan afsløre kortet.
 - [x] Konsistent placering af opslagsordet, så det ikke hopper når kortet åbnes.
-- [ ] Lad `Enter` fungere som "rigtigt" når kortet er afsløret, så streaks kan tastes som Enter-Enter-Enter.
+- [x] Lad `Enter` fungere som "rigtigt" når kortet er afsløret, så streaks kan tastes som Enter-Enter-Enter.
 - [ ] Skel tydeligt mellem definition og eksempler.
 - [ ] Vis altid et link til kilden, ikke kun ved afkortede definitioner.
 

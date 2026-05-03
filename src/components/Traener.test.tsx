@@ -98,6 +98,28 @@ describe("Træner", () => {
     expect(link).toHaveAttribute("href", "https://wordnet.dk/dannet/data/synset-12345");
   });
 
+  it("sender korrekt svar med Enter når kortet er afsløret", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => andetSnapshot,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<Træner bruger={bruger} førsteSnapshot={førsteSnapshot} />);
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{Enter}");
+
+    await waitFor(() => expect(screen.getByText("vandtæt")).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/reviews",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ cardId: "kort-1", rating: "correct" }),
+      }),
+    );
+  });
+
   it("sender korrekt svar med højre pil og viser næste kort", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
