@@ -71,7 +71,7 @@ Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt producti
 ## UI-opgaver
 
 - [x] Vis svar-knap så mobile brugere uden tastatur kan afsløre kortet.
-- [ ] Konsistent placering af opslagsordet, så det ikke hopper når kortet åbnes.
+- [x] Konsistent placering af opslagsordet, så det ikke hopper når kortet åbnes.
 - [ ] Lad `Enter` fungere som "rigtigt" når kortet er afsløret, så streaks kan tastes som Enter-Enter-Enter.
 - [ ] Skel tydeligt mellem definition og eksempler.
 - [ ] Vis altid et link til kilden, ikke kun ved afkortede definitioner.

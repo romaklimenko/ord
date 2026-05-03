@@ -56,14 +56,6 @@
 .kort,
 .kortDetaljer {
   width: min(100%, 1220px);
-}
-
-.kort {
-  margin: 0 auto;
-  text-align: center;
-}
-
-.kortDetaljer {
   margin: 0;
   text-align: left;
 }
