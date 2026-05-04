@@ -67,7 +67,9 @@ Gem outputtet til trin 5.
 
 ### Trin 5 — Miljøvariabler (sættes i Vercel før første deploy)
 
-Sæt disse for **Production**-scope. Du kan kopiere bloken her og indsætte i Vercels *Bulk Edit*:
+I Vercels environment-vælger, vælg kun **Production**. Lad *Preview* og *Development* stå tomme. Auth0-callback'en peger kun på `https://ord.klimenko.dk`, så preview-deploys på `*.vercel.app` ville fejle login alligevel, og det er bedre at preview-deploys ikke skriver til den samme Azure-tabel som produktion.
+
+Du kan kopiere bloken her og indsætte i Vercels *Bulk Edit*:
 
 ```text
 APP_BASE_URL=https://ord.klimenko.dk
