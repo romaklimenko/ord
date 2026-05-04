@@ -114,6 +114,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
           {vist ? (
             <div className={styles.definition}>
+              {renderFrekvensMaerkat(kort)}
               <p className={styles.forklaring}>{renderDefinition(kort)}</p>
               {kort.eksempler.length > 0 ? (
                 <div className={styles.eksempler}>
@@ -246,6 +247,29 @@ function kildeUrl(kort: import("@/lib/types").Kort) {
   }
   if (kort.opslagsord) {
     return `https://ordnet.dk/ddo/ordbog?query=${encodeURIComponent(kort.opslagsord)}`;
+  }
+  return null;
+}
+
+const ALMINDELIGT_GULV = 1e-4;
+
+function frekvensTier(kort: import("@/lib/types").Kort): "almindeligt" | "sjaeldent" | null {
+  if (typeof kort.frekvens !== "number") {
+    return "sjaeldent";
+  }
+  if (kort.frekvens >= ALMINDELIGT_GULV) {
+    return "almindeligt";
+  }
+  return null;
+}
+
+function renderFrekvensMaerkat(kort: import("@/lib/types").Kort) {
+  const tier = frekvensTier(kort);
+  if (tier === "almindeligt") {
+    return <span className={`${styles.maerkat} ${styles.maerkatAlmindeligt}`}>Almindeligt ord</span>;
+  }
+  if (tier === "sjaeldent") {
+    return <span className={`${styles.maerkat} ${styles.maerkatSjaeldent}`}>Sjældent ord</span>;
   }
   return null;
 }

@@ -87,6 +87,27 @@
   border-top: 1px solid var(--linje);
 }
 
+.maerkat {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.maerkatAlmindeligt {
+  background: var(--rigtigt-baggrund, #e6f4ea);
+  color: var(--rigtigt, #1f7a3a);
+}
+
+.maerkatSjaeldent {
+  background: var(--linje, #eee);
+  color: var(--sekundaer-tekst);
+}
+
 .forklaring {
   max-width: 1200px;
   margin: 0;

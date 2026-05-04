@@ -75,6 +75,62 @@ describe("Træner", () => {
     expect(screen.getByText("boble eller bule i asfaltbelægning")).toBeInTheDocument();
   });
 
+  it("viser 'Almindeligt ord'-mærkat for høj frekvens", async () => {
+    const almindeligtSnapshot: StudieSnapshot = {
+      kort: {
+        id: "kort-3",
+        opslagsord: "være",
+        ordklasse: "verbum",
+        definition: "eksistere",
+        eksempler: [],
+        kilde: "DanNet",
+        frekvens: 0.03,
+      },
+      statistik: førsteSnapshot.statistik,
+    };
+
+    render(<Træner bruger={bruger} førsteSnapshot={almindeligtSnapshot} />);
+    await userEvent.keyboard("{Enter}");
+    expect(screen.getByText("Almindeligt ord")).toBeInTheDocument();
+  });
+
+  it("viser 'Sjældent ord'-mærkat når frekvens mangler", async () => {
+    const sjaeldentSnapshot: StudieSnapshot = {
+      kort: {
+        id: "kort-4",
+        opslagsord: "silikonebryster",
+        ordklasse: "substantiv",
+        definition: "kunstige bryster",
+        eksempler: [],
+        kilde: "DanNet",
+      },
+      statistik: førsteSnapshot.statistik,
+    };
+
+    render(<Træner bruger={bruger} førsteSnapshot={sjaeldentSnapshot} />);
+    await userEvent.keyboard("{Enter}");
+    expect(screen.getByText("Sjældent ord")).toBeInTheDocument();
+  });
+
+  it("viser intet mærkat for ord i mellemfrekvens", async () => {
+    const mellemSnapshot: StudieSnapshot = {
+      kort: {
+        id: "kort-5",
+        opslagsord: "kage",
+        ordklasse: "substantiv",
+        definition: "noget sødt",
+        eksempler: [],
+        kilde: "DanNet",
+        frekvens: 1e-5,
+      },
+      statistik: førsteSnapshot.statistik,
+    };
+
+    render(<Træner bruger={bruger} førsteSnapshot={mellemSnapshot} />);
+    await userEvent.keyboard("{Enter}");
+    expect(screen.queryByText(/Almindeligt|Sjældent/)).not.toBeInTheDocument();
+  });
+
   it("viser kildelink også når definitionen er fuld", async () => {
     const fuldSnapshot: StudieSnapshot = {
       kort: {
