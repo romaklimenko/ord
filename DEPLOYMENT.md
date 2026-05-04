@@ -176,9 +176,9 @@ Lokalt kan følgende URL'er også tilføjes:
 
 Appen opretter tabellen automatisk, hvis den ikke findes. Den bruger én partition pr. bruger og rækker med disse prefixes:
 
-- `card#` for repetitionsstatus pr. kort
-- `day#` for daglige statistikaggregater
-- `evt#` for svarhistorik
+- `card:` for repetitionsstatus pr. kort
+- `day:` for daglige statistikaggregater
+- `evt:` for svarhistorik
 
 Storage keys må kun ligge i servermiljøet. Browseren må ikke få direkte skriveadgang til Azure Storage.
 

@@ -208,17 +208,17 @@ class AzureProgressRepository implements ProgressRepository {
     await this.sikreTabel();
     const partitionKey = brugerPartition(userId);
     const progress = tomProgress();
-    const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'card#' and RowKey lt 'card$'`;
+    const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'card:' and RowKey lt 'card;'`;
 
     for await (const entity of this.client.listEntities<KortEntity | DagEntity>({
       queryOptions: { filter },
     })) {
       const rowKey = entity.rowKey ?? "";
 
-      if (rowKey.startsWith("card#")) {
+      if (rowKey.startsWith("card:")) {
         const kort = entity as TableEntityResult<KortEntity>;
-        progress.kort[rowKey.slice("card#".length)] = {
-          cardId: rowKey.slice("card#".length),
+        progress.kort[rowKey.slice("card:".length)] = {
+          cardId: rowKey.slice("card:".length),
           repetitions: Number(kort.repetitions ?? 0),
           easeFactor: Number(kort.easeFactor ?? 2.5),
           intervalDays: Number(kort.intervalDays ?? 0),
@@ -231,12 +231,12 @@ class AzureProgressRepository implements ProgressRepository {
       }
     }
 
-    const dayFilter = `PartitionKey eq '${partitionKey}' and RowKey ge 'day#' and RowKey lt 'day$'`;
+    const dayFilter = `PartitionKey eq '${partitionKey}' and RowKey ge 'day:' and RowKey lt 'day;'`;
     for await (const entity of this.client.listEntities<DagEntity>({
       queryOptions: { filter: dayFilter },
     })) {
       const rowKey = entity.rowKey ?? "";
-      const dato = rowKey.slice("day#".length);
+      const dato = rowKey.slice("day:".length);
       progress.dage[dato] = {
         dato,
         svar: Number(entity.svar ?? 0),
@@ -257,7 +257,7 @@ class AzureProgressRepository implements ProgressRepository {
     await this.client.upsertEntity(
       {
         partitionKey,
-        rowKey: `card#${state.cardId}`,
+        rowKey: `card:${state.cardId}`,
         repetitions: state.repetitions,
         easeFactor: state.easeFactor,
         intervalDays: state.intervalDays,
@@ -273,7 +273,7 @@ class AzureProgressRepository implements ProgressRepository {
     await this.client.upsertEntity(
       {
         partitionKey,
-        rowKey: `day#${dag.dato}`,
+        rowKey: `day:${dag.dato}`,
         svar: dag.svar,
         rigtige: dag.rigtige,
         forkerte: dag.forkerte,
@@ -284,7 +284,7 @@ class AzureProgressRepository implements ProgressRepository {
     await this.client.upsertEntity(
       {
         partitionKey,
-        rowKey: `evt#${reverseTicks}#${event.cardId}#${eventId}`,
+        rowKey: `evt:${reverseTicks}:${event.cardId}:${eventId}`,
         cardId: event.cardId,
         rating: event.rating,
         reviewedAt: event.reviewedAt,
@@ -299,7 +299,7 @@ class AzureProgressRepository implements ProgressRepository {
   async fortrydSidsteReview(userId: string): Promise<FortrydResultat | null> {
     await this.sikreTabel();
     const partitionKey = brugerPartition(userId);
-    const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'evt#' and RowKey lt 'evt$'`;
+    const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'evt:' and RowKey lt 'evt;'`;
 
     let nyesteEvent:
       | (TableEntityResult<Record<string, unknown>> & {
@@ -342,7 +342,7 @@ class AzureProgressRepository implements ProgressRepository {
       await this.client.upsertEntity(
         {
           partitionKey,
-          rowKey: `card#${cardId}`,
+          rowKey: `card:${cardId}`,
           repetitions: forrigeKort.repetitions,
           easeFactor: forrigeKort.easeFactor,
           intervalDays: forrigeKort.intervalDays,
@@ -355,7 +355,7 @@ class AzureProgressRepository implements ProgressRepository {
         "Replace",
       );
     } else {
-      await this.deleteEntityIgnoreMissing(partitionKey, `card#${cardId}`);
+      await this.deleteEntityIgnoreMissing(partitionKey, `card:${cardId}`);
     }
 
     const dato = tilDatoNøgle(new Date(reviewedAt));
@@ -363,7 +363,7 @@ class AzureProgressRepository implements ProgressRepository {
       await this.client.upsertEntity(
         {
           partitionKey,
-          rowKey: `day#${forrigeDag.dato}`,
+          rowKey: `day:${forrigeDag.dato}`,
           svar: forrigeDag.svar,
           rigtige: forrigeDag.rigtige,
           forkerte: forrigeDag.forkerte,
@@ -371,7 +371,7 @@ class AzureProgressRepository implements ProgressRepository {
         "Replace",
       );
     } else {
-      await this.deleteEntityIgnoreMissing(partitionKey, `day#${dato}`);
+      await this.deleteEntityIgnoreMissing(partitionKey, `day:${dato}`);
     }
 
     await this.deleteEntityIgnoreMissing(partitionKey, nyesteEvent.rowKey);
