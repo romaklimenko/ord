@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import type { AktuelBruger } from "@/lib/session";
+import { erGæst } from "@/lib/session";
 import type { ReviewRating, StudieSnapshot } from "@/lib/types";
 import styles from "./Traener.module.css";
 
@@ -26,6 +27,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
   const [sidsteReview, setSidsteReview] = useState<SidsteReview | null>(null);
 
   const kort = snapshot.kort;
+  const gæst = erGæst(bruger);
   const ordStil = {
     "--ord-stoerrelse": `${beregnOrdStørrelse(kort.opslagsord)}rem`,
   } as CSSProperties;
@@ -127,7 +129,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
           Ord
         </Link>
         <nav className={styles.navigation} aria-label="Hovednavigation">
-          <Link href="/statistik">Statistik</Link>
+          {!gæst ? <Link href="/statistik">Statistik</Link> : null}
           {bruger.authAktiv ? (
             <a href="/auth/logout">Log ud</a>
           ) : bruger.authKonfigureret ? (
@@ -139,9 +141,9 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       </header>
 
       <section className={styles.træner} aria-live="polite">
-        <div className={styles.dagScore}>{snapshot.statistik.svarIDag}</div>
+        {!gæst ? <div className={styles.dagScore}>{snapshot.statistik.svarIDag}</div> : null}
 
-        {sidsteReview && !vist ? (
+        {sidsteReview && !vist && !gæst ? (
           <div className={styles.fortrydLinje}>
             <button
               type="button"
@@ -213,10 +215,16 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       </section>
 
       <footer className={styles.bundlinje}>
-        <p>
-          {snapshot.statistik.totalCards} ord i alt, {snapshot.statistik.modneCards} modne,{" "}
-          {snapshot.statistik.setCards} set, {snapshot.statistik.dueToday} skal øves i dag.
-        </p>
+        {gæst ? (
+          <p>
+            Du prøver appen som gæst — svar gemmes ikke. <a href="/auth/login">Log ind</a> for at gemme progression.
+          </p>
+        ) : (
+          <p>
+            {snapshot.statistik.totalCards} ord i alt, {snapshot.statistik.modneCards} modne,{" "}
+            {snapshot.statistik.setCards} set, {snapshot.statistik.dueToday} skal øves i dag.
+          </p>
+        )}
         <p className={styles.kilde}>
           Data:{" "}
           <a href="https://wordnet.dk/dannet/data" rel="noreferrer" target="_blank">

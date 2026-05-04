@@ -8,6 +8,10 @@ export type AktuelBruger = {
   authAktiv: boolean;
 };
 
+export function erGæst(bruger: AktuelBruger): boolean {
+  return bruger.authKonfigureret && !bruger.authAktiv;
+}
+
 export async function hentAktuelBruger(): Promise<AktuelBruger> {
   if (harAuth0Konfiguration()) {
     const session = await hentAuth0().getSession();

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { hentAktuelBruger } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { erGæst, hentAktuelBruger } from "@/lib/session";
 import { hentStatistikOversigt } from "@/lib/study";
 import styles from "./statistik.module.css";
 
@@ -7,6 +8,9 @@ export const dynamic = "force-dynamic";
 
 export default async function StatistikSide() {
   const bruger = await hentAktuelBruger();
+  if (erGæst(bruger)) {
+    redirect("/auth/login");
+  }
   const { statistik, dage } = await hentStatistikOversigt(bruger.id);
   const maxSvar = Math.max(1, ...dage.map((dag) => dag.svar));
 
