@@ -73,6 +73,21 @@ describe("erUegnetSomFlashcard", () => {
     expect(erUegnetSomFlashcard("praktiserende læge")).toBe(false);
     expect(erUegnetSomFlashcard("vandtæt")).toBe(false);
   });
+
+  it("kasserer rene tal", () => {
+    expect(erUegnetSomFlashcard("117")).toBe(true);
+    expect(erUegnetSomFlashcard("0")).toBe(true);
+  });
+
+  it("kasserer ontologi-lækager fra DanNet", () => {
+    expect(erUegnetSomFlashcard("1stOrder")).toBe(true);
+  });
+
+  it("beholder formede tal-ord og bindestregsformer", () => {
+    expect(erUegnetSomFlashcard("13-tal")).toBe(false);
+    expect(erUegnetSomFlashcard("1. reservelæge")).toBe(false);
+    expect(erUegnetSomFlashcard("26-tommers")).toBe(false);
+  });
 });
 
 describe("parseFrekvensIndhold", () => {

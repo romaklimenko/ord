@@ -30,6 +30,16 @@ export function erUegnetSomFlashcard(form) {
   if (/[()]/.test(form)) {
     return true;
   }
+  // Ren-numeriske former som "117" er ikke et reelt opslagsord.
+  if (/^\d+$/.test(form)) {
+    return true;
+  }
+  // Ontologi-lækager fra DanNet ("1stOrder", "FirstOrderEntity") starter
+  // med ciffer eller ASCII-CamelCase uden mellemrum og indeholder ingen
+  // danske bogstaver eller bindestreger.
+  if (/^[0-9]+[A-Za-z]*[A-Z][a-z]/.test(form)) {
+    return true;
+  }
   return false;
 }
 
