@@ -57,6 +57,13 @@ export function erUegnetSomFlashcard(form) {
   if (/^[0-9]+[A-Za-z]*[A-Z][a-z]/.test(form)) {
     return true;
   }
+  // Proprier (egennavne): stort begyndelsesbogstav efterfulgt af mindst ét
+  // lille bogstav. Dækker fx "Polen", "Aarhus", "Puerto Rico", "Olsen".
+  // Akronymer som "ED", "USA" og "VM-hold" har ikke lowercase efter den
+  // første kapital og bliver derfor beholdt.
+  if (/^[A-ZÆØÅ][a-zæøå]/u.test(form)) {
+    return true;
+  }
   return false;
 }
 

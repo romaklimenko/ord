@@ -92,6 +92,28 @@ describe("erUegnetSomFlashcard", () => {
     expect(erUegnetSomFlashcard("1. reservelæge")).toBe(false);
     expect(erUegnetSomFlashcard("26-tommers")).toBe(false);
   });
+
+  it("kasserer proprier (egennavne)", () => {
+    expect(erUegnetSomFlashcard("Polen")).toBe(true);
+    expect(erUegnetSomFlashcard("Aarhus")).toBe(true);
+    expect(erUegnetSomFlashcard("Puerto Rico")).toBe(true);
+    expect(erUegnetSomFlashcard("Olsen")).toBe(true);
+    expect(erUegnetSomFlashcard("Nørre Broby")).toBe(true);
+  });
+
+  it("beholder akronymer og forkortelser", () => {
+    expect(erUegnetSomFlashcard("ED")).toBe(false);
+    expect(erUegnetSomFlashcard("USA")).toBe(false);
+    expect(erUegnetSomFlashcard("VM-hold")).toBe(false);
+    expect(erUegnetSomFlashcard("A-officer")).toBe(false);
+    expect(erUegnetSomFlashcard("PMV")).toBe(false);
+  });
+
+  it("beholder danske ord der starter med ø/æ/å", () => {
+    expect(erUegnetSomFlashcard("økologisk")).toBe(false);
+    expect(erUegnetSomFlashcard("æggestand")).toBe(false);
+    expect(erUegnetSomFlashcard("ødeland")).toBe(false);
+  });
 });
 
 describe("parseFrekvensIndhold", () => {
