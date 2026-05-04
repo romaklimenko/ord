@@ -19,7 +19,7 @@
 
 ## Næste anbefalede opgave
 
-Opret Vercel-projekt, Auth0-applikation og Azure Storage-konto, og sæt production-miljøvariablerne.
+Følg trin-for-trin-planen i `DEPLOYMENT.md` for at oprette Azure Storage, Auth0, Vercel-projekt og custom domain. Kræver kun cloud-konsol-arbejde; ingen kodeændringer.
 
 ## Beslutninger
 
