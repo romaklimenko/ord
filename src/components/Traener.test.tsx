@@ -198,6 +198,38 @@ describe("Træner", () => {
     );
   });
 
+  it("viser Fortryd-knappen efter et svar og kalder undo-endpointet ved klik", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => andetSnapshot,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => førsteSnapshot,
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<Træner bruger={bruger} førsteSnapshot={førsteSnapshot} />);
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{ArrowRight}");
+
+    const fortryd = await screen.findByRole("button", { name: /Fortryd sidste svar/ });
+    await userEvent.click(fortryd);
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/reviews/undo",
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: /Fortryd sidste svar/ })).not.toBeInTheDocument(),
+    );
+  });
+
   it("sender korrekt svar med højre pil og viser næste kort", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,

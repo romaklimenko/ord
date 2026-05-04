@@ -19,6 +19,12 @@ type ReviewEvent = {
   rating: ReviewRating;
   reviewedAt: string;
   nextDueAt: string;
+  forrigeKort: Korttilstand | null;
+  forrigeDag: DagligStatistik | null;
+};
+
+export type FortrydResultat = {
+  cardId: string;
 };
 
 type ProgressRepository = {
@@ -29,6 +35,7 @@ type ProgressRepository = {
     dag: DagligStatistik,
     event: ReviewEvent,
   ): Promise<void>;
+  fortrydSidsteReview(userId: string): Promise<FortrydResultat | null>;
 };
 
 type LokalDatabase = {
@@ -83,10 +90,8 @@ export function hentProgressRepository() {
 }
 
 class FilProgressRepository implements ProgressRepository {
-  private fil: string;
-
-  constructor() {
-    this.fil = path.join(process.cwd(), ".ord-dev", "progress.json");
+  private get fil() {
+    return path.join(process.cwd(), ".ord-dev", "progress.json");
   }
 
   async hent(userId: string) {
@@ -108,6 +113,39 @@ class FilProgressRepository implements ProgressRepository {
 
     await fs.mkdir(path.dirname(this.fil), { recursive: true });
     await fs.writeFile(this.fil, `${JSON.stringify(db, null, 2)}\n`, "utf8");
+  }
+
+  async fortrydSidsteReview(userId: string): Promise<FortrydResultat | null> {
+    const db = await this.læsDatabase();
+    const key = brugerPartition(userId);
+    const bruger = db.users[key];
+    if (!bruger || bruger.events.length === 0) {
+      return null;
+    }
+    const event = bruger.events[0];
+    if (event.forrigeKort === undefined || event.forrigeDag === undefined) {
+      return null;
+    }
+
+    if (event.forrigeKort === null) {
+      delete bruger.kort[event.cardId];
+    } else {
+      bruger.kort[event.cardId] = event.forrigeKort;
+    }
+
+    const dato = tilDatoNøgle(new Date(event.reviewedAt));
+    if (event.forrigeDag === null) {
+      delete bruger.dage[dato];
+    } else {
+      bruger.dage[event.forrigeDag.dato] = event.forrigeDag;
+    }
+
+    bruger.events.shift();
+    db.users[key] = bruger;
+
+    await fs.mkdir(path.dirname(this.fil), { recursive: true });
+    await fs.writeFile(this.fil, `${JSON.stringify(db, null, 2)}\n`, "utf8");
+    return { cardId: event.cardId };
   }
 
   private async læsDatabase(): Promise<LokalDatabase> {
@@ -251,9 +289,104 @@ class AzureProgressRepository implements ProgressRepository {
         rating: event.rating,
         reviewedAt: event.reviewedAt,
         nextDueAt: event.nextDueAt,
+        forrigeKortJson: event.forrigeKort ? JSON.stringify(event.forrigeKort) : "",
+        forrigeDagJson: event.forrigeDag ? JSON.stringify(event.forrigeDag) : "",
       },
       "Replace",
     );
+  }
+
+  async fortrydSidsteReview(userId: string): Promise<FortrydResultat | null> {
+    await this.sikreTabel();
+    const partitionKey = brugerPartition(userId);
+    const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'evt#' and RowKey lt 'evt$'`;
+
+    let nyesteEvent:
+      | (TableEntityResult<Record<string, unknown>> & {
+          rowKey: string;
+        })
+      | null = null;
+
+    for await (const entity of this.client.listEntities<Record<string, unknown>>({
+      queryOptions: { filter },
+    })) {
+      // RowKey'en er konstrueret med reverseTicks, så listEntities returnerer
+      // den nyeste først. Vi tager kun det første element.
+      nyesteEvent = entity as TableEntityResult<Record<string, unknown>> & {
+        rowKey: string;
+      };
+      break;
+    }
+
+    if (!nyesteEvent) {
+      return null;
+    }
+
+    const cardId = String(nyesteEvent.cardId ?? "");
+    const reviewedAt = String(nyesteEvent.reviewedAt ?? "");
+    const forrigeKortJson = nyesteEvent.forrigeKortJson;
+    const forrigeDagJson = nyesteEvent.forrigeDagJson;
+
+    if (typeof forrigeKortJson !== "string" || typeof forrigeDagJson !== "string") {
+      return null;
+    }
+
+    const forrigeKort = forrigeKortJson
+      ? (JSON.parse(forrigeKortJson) as Korttilstand)
+      : null;
+    const forrigeDag = forrigeDagJson
+      ? (JSON.parse(forrigeDagJson) as DagligStatistik)
+      : null;
+
+    if (forrigeKort) {
+      await this.client.upsertEntity(
+        {
+          partitionKey,
+          rowKey: `card#${cardId}`,
+          repetitions: forrigeKort.repetitions,
+          easeFactor: forrigeKort.easeFactor,
+          intervalDays: forrigeKort.intervalDays,
+          dueAt: forrigeKort.dueAt,
+          lastReviewedAt: forrigeKort.lastReviewedAt,
+          seen: forrigeKort.seen,
+          correct: forrigeKort.correct,
+          wrong: forrigeKort.wrong,
+        },
+        "Replace",
+      );
+    } else {
+      await this.deleteEntityIgnoreMissing(partitionKey, `card#${cardId}`);
+    }
+
+    const dato = tilDatoNøgle(new Date(reviewedAt));
+    if (forrigeDag) {
+      await this.client.upsertEntity(
+        {
+          partitionKey,
+          rowKey: `day#${forrigeDag.dato}`,
+          svar: forrigeDag.svar,
+          rigtige: forrigeDag.rigtige,
+          forkerte: forrigeDag.forkerte,
+        },
+        "Replace",
+      );
+    } else {
+      await this.deleteEntityIgnoreMissing(partitionKey, `day#${dato}`);
+    }
+
+    await this.deleteEntityIgnoreMissing(partitionKey, nyesteEvent.rowKey);
+    return { cardId };
+  }
+
+  private async deleteEntityIgnoreMissing(partitionKey: string, rowKey: string) {
+    try {
+      await this.client.deleteEntity(partitionKey, rowKey);
+    } catch (error) {
+      const statusCode = (error as { statusCode?: number }).statusCode;
+      if (statusCode !== 404) {
+        throw error;
+      }
+    }
   }
 
   private sikreTabel() {

@@ -53,6 +53,32 @@
   font-weight: 600;
 }
 
+.fortrydLinje {
+  position: absolute;
+  top: 38px;
+  left: 0;
+}
+
+.fortryd {
+  border: 1px solid var(--linje);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  color: var(--sekundaer-tekst);
+  font-size: 0.85rem;
+}
+
+.fortryd:hover {
+  border-color: var(--linje-staerk);
+  color: var(--tekst);
+}
+
+.fortryd:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .kort,
 .kortDetaljer {
   width: min(100%, 1220px);

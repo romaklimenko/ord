@@ -122,9 +122,11 @@ export async function registrerReview(
     throw new Error(`Ukendt kort: ${cardId}`);
   }
 
-  const eksisterende = progress.kort[cardId] ?? nyKorttilstand(cardId, now);
+  const forrigeKort = progress.kort[cardId] ?? null;
+  const eksisterende = forrigeKort ?? nyKorttilstand(cardId, now);
   const næsteState = planlægNæsteReview(cardId, eksisterende, rating, now);
   const dato = tilDatoNøgle(now);
+  const forrigeDag = progress.dage[dato] ?? null;
   const dag = hentDag(progress, dato);
   const næsteDag = {
     dato,
@@ -138,7 +140,17 @@ export async function registrerReview(
     rating,
     reviewedAt: now.toISOString(),
     nextDueAt: næsteState.dueAt,
+    forrigeKort,
+    forrigeDag,
   });
 
+  return hentStudieSnapshot(userId);
+}
+
+export async function fortrydSidsteReview(userId: string): Promise<StudieSnapshot> {
+  const resultat = await hentProgressRepository().fortrydSidsteReview(userId);
+  if (!resultat) {
+    throw new Error("Intet review at fortryde.");
+  }
   return hentStudieSnapshot(userId);
 }

@@ -12,11 +12,18 @@ type Props = {
   førsteSnapshot: StudieSnapshot;
 };
 
+type SidsteReview = {
+  cardId: string;
+  opslagsord: string;
+  rating: ReviewRating;
+};
+
 export function Træner({ bruger, førsteSnapshot }: Props) {
   const [snapshot, setSnapshot] = useState(førsteSnapshot);
   const [vist, setVist] = useState(false);
   const [sender, setSender] = useState(false);
   const [fejl, setFejl] = useState<string | null>(null);
+  const [sidsteReview, setSidsteReview] = useState<SidsteReview | null>(null);
 
   const kort = snapshot.kort;
   const ordStil = {
@@ -31,6 +38,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
       setSender(true);
       setFejl(null);
+      const reviewedKort = { cardId: kort.id, opslagsord: kort.opslagsord, rating };
 
       try {
         const response = await fetch("/api/reviews", {
@@ -46,14 +54,39 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         const næsteSnapshot = (await response.json()) as StudieSnapshot;
         setSnapshot(næsteSnapshot);
         setVist(false);
+        setSidsteReview(reviewedKort);
       } catch (error) {
         setFejl(error instanceof Error ? error.message : "Der opstod en fejl.");
       } finally {
         setSender(false);
       }
     },
-    [kort.id, sender],
+    [kort.id, kort.opslagsord, sender],
   );
+
+  const fortrydReview = useCallback(async () => {
+    if (sender || !sidsteReview) {
+      return;
+    }
+
+    setSender(true);
+    setFejl(null);
+
+    try {
+      const response = await fetch("/api/reviews/undo", { method: "POST" });
+      if (!response.ok) {
+        throw new Error("Kunne ikke fortryde svaret.");
+      }
+      const næsteSnapshot = (await response.json()) as StudieSnapshot;
+      setSnapshot(næsteSnapshot);
+      setVist(false);
+      setSidsteReview(null);
+    } catch (error) {
+      setFejl(error instanceof Error ? error.message : "Der opstod en fejl.");
+    } finally {
+      setSender(false);
+    }
+  }, [sender, sidsteReview]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -107,6 +140,20 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
       <section className={styles.træner} aria-live="polite">
         <div className={styles.dagScore}>{snapshot.statistik.svarIDag}</div>
+
+        {sidsteReview && !vist ? (
+          <div className={styles.fortrydLinje}>
+            <button
+              type="button"
+              className={styles.fortryd}
+              onClick={() => void fortrydReview()}
+              disabled={sender}
+              title={`Fortryd '${sidsteReview.rating === "correct" ? "Rigtigt" : "Forkert"}' på ${sidsteReview.opslagsord}`}
+            >
+              Fortryd sidste svar ({sidsteReview.opslagsord})
+            </button>
+          </div>
+        ) : null}
 
         <article className={vist ? styles.kortDetaljer : styles.kort}>
           <p className={styles.ordklasse}>{oversætOrdklasse(kort.ordklasse)}</p>
