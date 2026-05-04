@@ -150,8 +150,9 @@ Indhold:
 
 Anvendelse:
 
-- God kandidat til ordidentitet og kobling til DDO-ID'er.
-- Indeholder ikke betydningsforklaringer.
+- Kataloget kan udvides med DDO-id pr. kort via `--ddo-lemmaer <fil>` på `import:dannet`. Opslag matches på (lemma, ordklasse) efter normalisering.
+- Når et kort har `ddoId`, kan UI'en senere linke direkte til den specifikke artikel på ordnet.dk.
+- Filen er bag DSL's accept-formular. Læg den decompresede TSV i fx `C:\tmp\ord-dsl\ddo\ddo-lemmaer.tsv` og pas på ikke at committe den.
 
 ### DDO-fuldformsliste
 
@@ -167,8 +168,8 @@ Indhold:
 
 Anvendelse:
 
-- God kandidat til søgning, importnormalisering og genkendelse af bøjede former.
-- Indeholder ikke bøjningsoplysninger pr. form og kan indeholde sjældne eller automatisk genererede former.
+- Importen kan tage filen via `--ddo-fuldformer <fil>` og skrive den til `public/katalog/v1/fuldformer.json` som en sidefil. Den bruges ikke i UI'en endnu, men gør det muligt senere at understøtte søgning på bøjede former.
+- Filen er bag DSL's accept-formular og placeres uden for repoet.
 
 ### COR.SEM
 

@@ -7,8 +7,25 @@ const ORDKLASSE_MAP = {
   adverb: "adverbium",
 };
 
+const DDO_ORDKLASSE_MAP = {
+  "sb.": "substantiv",
+  "vb.": "verbum",
+  "adj.": "adjektiv",
+  "adv.": "adverbium",
+  "præp.": "præposition",
+  "konj.": "konjunktion",
+  "pron.": "pronomen",
+  "interj.": "interjektion",
+};
+
 export function normaliserOrdklasse(pos) {
   return ORDKLASSE_MAP[pos] ?? pos;
+}
+
+export function normaliserDdoOrdklasse(pos) {
+  if (!pos) return "";
+  const trimmet = pos.trim().toLowerCase();
+  return DDO_ORDKLASSE_MAP[trimmet] ?? trimmet;
 }
 
 export function trimDefinition(definition) {
@@ -72,6 +89,66 @@ export async function indlæsFrekvens(file) {
     throw error;
   }
   return parseFrekvensIndhold(content);
+}
+
+function ddoNoegle(opslagsord, ordklasse) {
+  return `${opslagsord.trim().toLowerCase()}|${normaliserDdoOrdklasse(ordklasse)}`;
+}
+
+// DDO-lemma TSV: opslagsord<TAB>homograf<TAB>ordklasse<TAB>ddo-id
+// Returnerer en Map keyed on `${lemma}|${ordklasse-på-dansk}` -> ddoId.
+// Hvis flere homografer deler samme nøgle, vinder den med laveste homograf-nr
+// (typisk den primære).
+export function parseDdoLemmaer(content) {
+  const map = new Map();
+  for (const line of content.split(/\r?\n/)) {
+    if (!line) continue;
+    const parts = line.split("\t");
+    if (parts.length < 4) continue;
+    const [opslagsord, homograf, ordklasse, ddoId] = parts;
+    if (!opslagsord || !ddoId || !/^\d+$/.test(ddoId.trim())) continue;
+    const key = ddoNoegle(opslagsord, ordklasse);
+    const homografNr = Number.parseInt(homograf, 10);
+    const eksisterende = map.get(key);
+    if (
+      !eksisterende ||
+      (Number.isFinite(homografNr) && homografNr < eksisterende.homograf)
+    ) {
+      map.set(key, {
+        ddoId: ddoId.trim(),
+        homograf: Number.isFinite(homografNr) ? homografNr : Number.POSITIVE_INFINITY,
+      });
+    }
+  }
+  const flad = new Map();
+  for (const [key, value] of map) {
+    flad.set(key, value.ddoId);
+  }
+  return flad;
+}
+
+// DDO-fullform TSV: bøjningsform<TAB>opslagsform<TAB>homograf<TAB>ordklasse<TAB>ddo-id
+// Returnerer en liste {form, opslagsform, ordklasse, ddoId}.
+export function parseDdoFullformer(content) {
+  const rows = [];
+  for (const line of content.split(/\r?\n/)) {
+    if (!line) continue;
+    const parts = line.split("\t");
+    if (parts.length < 5) continue;
+    const [form, opslagsform, , ordklasse, ddoId] = parts;
+    if (!form || !opslagsform || !ddoId || !/^\d+$/.test(ddoId.trim())) continue;
+    rows.push({
+      form: form.trim(),
+      opslagsform: opslagsform.trim(),
+      ordklasse: normaliserDdoOrdklasse(ordklasse),
+      ddoId: ddoId.trim(),
+    });
+  }
+  return rows;
+}
+
+export function ddoLookup(ddoMap, opslagsord, ordklasse) {
+  return ddoMap.get(`${opslagsord.trim().toLowerCase()}|${ordklasse}`);
 }
 
 export function parseCsvLine(line) {

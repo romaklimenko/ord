@@ -2,11 +2,14 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import {
+  ddoLookup,
   erAfkortetDefinition,
   erUegnetSomFlashcard,
   indlæsFrekvens,
   normaliserOrdklasse,
   parseCsvLine,
+  parseDdoFullformer,
+  parseDdoLemmaer,
   trimDefinition,
 } from "./import-helpers.mjs";
 
@@ -20,6 +23,8 @@ function parseArgs(argv) {
     source: DEFAULT_SOURCE,
     target: DEFAULT_TARGET,
     frekvens: DEFAULT_FREKVENS,
+    ddoLemmaer: null,
+    ddoFuldformer: null,
     limit: null,
   };
 
@@ -31,6 +36,10 @@ function parseArgs(argv) {
       args.target = argv[++i];
     } else if (arg === "--frekvens") {
       args.frekvens = argv[++i];
+    } else if (arg === "--ddo-lemmaer") {
+      args.ddoLemmaer = argv[++i];
+    } else if (arg === "--ddo-fuldformer") {
+      args.ddoFuldformer = argv[++i];
     } else if (arg === "--limit") {
       args.limit = Number(argv[++i]);
     } else {
@@ -39,6 +48,19 @@ function parseArgs(argv) {
   }
 
   return args;
+}
+
+async function indlæsValgfriTekstfil(file, label) {
+  if (!file) return null;
+  try {
+    return await fs.readFile(path.resolve(file), "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      console.warn(`${label} mangler (${file}). Kataloget bygges uden ${label}.`);
+      return null;
+    }
+    throw error;
+  }
 }
 
 async function readCsv(file) {
@@ -54,13 +76,26 @@ async function main() {
   const source = path.resolve(args.source);
   const target = path.resolve(args.target);
 
-  const [wordRows, senseRows, synsetRows, exampleRows, frekvensMap] = await Promise.all([
+  const [
+    wordRows,
+    senseRows,
+    synsetRows,
+    exampleRows,
+    frekvensMap,
+    ddoLemmaerIndhold,
+    ddoFuldformerIndhold,
+  ] = await Promise.all([
     readCsv(path.join(source, "words.csv")),
     readCsv(path.join(source, "senses.csv")),
     readCsv(path.join(source, "synsets.csv")),
     readCsv(path.join(source, "examples.csv")),
     indlæsFrekvens(path.resolve(args.frekvens)),
+    indlæsValgfriTekstfil(args.ddoLemmaer, "DDO-lemmaliste"),
+    indlæsValgfriTekstfil(args.ddoFuldformer, "DDO-fuldformsliste"),
   ]);
+
+  const ddoMap = ddoLemmaerIndhold ? parseDdoLemmaer(ddoLemmaerIndhold) : new Map();
+  const ddoFuldformer = ddoFuldformerIndhold ? parseDdoFullformer(ddoFuldformerIndhold) : [];
 
   const words = new Map(
     wordRows
@@ -96,11 +131,13 @@ async function main() {
     }
 
     const frekvens = frekvensMap.get(word.form.toLowerCase());
+    const ordklasse = normaliserOrdklasse(word.pos);
+    const ddoId = ddoLookup(ddoMap, word.form, ordklasse);
 
     cards.push({
       id: senseId,
       opslagsord: word.form,
-      ordklasse: normaliserOrdklasse(word.pos),
+      ordklasse,
       definition,
       eksempler: (examples.get(senseId) ?? []).slice(0, 2),
       kilde: "DanNet",
@@ -108,6 +145,7 @@ async function main() {
       synsetId,
       afkortet: erAfkortetDefinition(definition),
       ...(frekvens !== undefined ? { frekvens } : {}),
+      ...(ddoId ? { ddoId } : {}),
     });
   }
 
@@ -128,6 +166,15 @@ async function main() {
 
   const truncatedCards = limitedCards.filter((kort) => kort.afkortet).length;
   const rangeredeCards = limitedCards.filter((kort) => typeof kort.frekvens === "number").length;
+  const ddoMatchede = limitedCards.filter((kort) => typeof kort.ddoId === "string").length;
+
+  if (ddoFuldformer.length > 0) {
+    await fs.writeFile(
+      path.join(target, "fuldformer.json"),
+      `${JSON.stringify(ddoFuldformer)}\n`,
+      "utf8",
+    );
+  }
 
   const manifest = {
     version: "v1",
@@ -136,6 +183,8 @@ async function main() {
     totalCards: limitedCards.length,
     truncatedCards,
     rangeredeCards,
+    ddoMatchede,
+    fuldformer: ddoFuldformer.length,
     shards,
     attribution: {
       title: "DanNet",
@@ -150,11 +199,19 @@ async function main() {
             url: "https://sprogteknologi.dk/dataset/10-000-mest-frekvente-lemmaer",
           }
         : null,
+    ddoKilde:
+      ddoMatchede > 0 || ddoFuldformer.length > 0
+        ? {
+            title: "Den Danske Ordbog – lemma- og fuldformsliste",
+            license: "DSL Åben Licens",
+            url: "https://korpus.dsl.dk/resources/details/ddo-lemmas.html",
+          }
+        : null,
   };
 
   await fs.writeFile(path.join(target, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   console.log(
-    `Skrev ${limitedCards.length} kort til ${target} (${rangeredeCards} med frekvens, ${truncatedCards} afkortede).`,
+    `Skrev ${limitedCards.length} kort til ${target} (${rangeredeCards} med frekvens, ${ddoMatchede} med DDO-id, ${truncatedCards} afkortede, ${ddoFuldformer.length} fuldformer).`,
   );
 }
 

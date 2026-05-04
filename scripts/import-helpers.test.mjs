@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  ddoLookup,
   erAfkortetDefinition,
   erUegnetSomFlashcard,
+  normaliserDdoOrdklasse,
   normaliserOrdklasse,
   parseCsvLine,
+  parseDdoFullformer,
+  parseDdoLemmaer,
   parseFrekvensIndhold,
   trimDefinition,
 } from "./import-helpers.mjs";
@@ -113,6 +117,66 @@ describe("parseFrekvensIndhold", () => {
     );
     expect(map.has("være")).toBe(false);
     expect(map.get("komme")).toBe(0.02);
+  });
+});
+
+describe("normaliserDdoOrdklasse", () => {
+  it("oversætter DDO-forkortelser til danske fulde navne", () => {
+    expect(normaliserDdoOrdklasse("sb.")).toBe("substantiv");
+    expect(normaliserDdoOrdklasse("vb.")).toBe("verbum");
+    expect(normaliserDdoOrdklasse("adj.")).toBe("adjektiv");
+    expect(normaliserDdoOrdklasse("adv.")).toBe("adverbium");
+  });
+
+  it("returnerer ukendte forkortelser i lowercase", () => {
+    expect(normaliserDdoOrdklasse("XYZ")).toBe("xyz");
+  });
+
+  it("håndterer tom input uden at kaste", () => {
+    expect(normaliserDdoOrdklasse("")).toBe("");
+    expect(normaliserDdoOrdklasse(undefined)).toBe("");
+  });
+});
+
+describe("parseDdoLemmaer", () => {
+  it("læser opslagsord, ordklasse og DDO-id fra TSV", () => {
+    const map = parseDdoLemmaer("kage\t1\tsb.\t11034567\nvære\t1\tvb.\t11098765\n");
+    expect(ddoLookup(map, "kage", "substantiv")).toBe("11034567");
+    expect(ddoLookup(map, "være", "verbum")).toBe("11098765");
+  });
+
+  it("foretrækker laveste homograf-nummer når flere matcher", () => {
+    const map = parseDdoLemmaer("kage\t2\tsb.\t99999999\nkage\t1\tsb.\t11034567\n");
+    expect(ddoLookup(map, "kage", "substantiv")).toBe("11034567");
+  });
+
+  it("springer linjer uden gyldigt DDO-id over", () => {
+    const map = parseDdoLemmaer("kage\t1\tsb.\tikke-et-tal\nvære\t1\tvb.\t11098765\n");
+    expect(ddoLookup(map, "kage", "substantiv")).toBeUndefined();
+    expect(ddoLookup(map, "være", "verbum")).toBe("11098765");
+  });
+});
+
+describe("parseDdoFullformer", () => {
+  it("returnerer alle bøjningsformer med tilknyttet opslagsform og DDO-id", () => {
+    const rows = parseDdoFullformer(
+      "kage\tkage\t1\tsb.\t11034567\nkagen\tkage\t1\tsb.\t11034567\nkager\tkage\t1\tsb.\t11034567\n",
+    );
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toEqual({
+      form: "kage",
+      opslagsform: "kage",
+      ordklasse: "substantiv",
+      ddoId: "11034567",
+    });
+    expect(rows[1].form).toBe("kagen");
+  });
+
+  it("springer ufuldstændige linjer over", () => {
+    const rows = parseDdoFullformer(
+      "kage\tkage\t1\tsb.\t11034567\nbroken-line\nkagen\tkage\t1\tsb.\t11034567\n",
+    );
+    expect(rows).toHaveLength(2);
   });
 });
 
