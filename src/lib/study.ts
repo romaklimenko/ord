@@ -1,6 +1,6 @@
 import { hentKatalog } from "@/lib/catalog";
 import { senesteDatoNøgler, tilDatoNøgle } from "@/lib/date";
-import { hentDag, hentProgressRepository } from "@/lib/progress";
+import { hentDag, hentProgressRepository, type BrugerProgress } from "@/lib/progress";
 import { nyKorttilstand, planlægNæsteReview } from "@/lib/sm2";
 import type {
   Kort,
@@ -66,6 +66,33 @@ export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
   return vægtetTilfældigt(fallback, (kort) => frekvensVægt(kort.frekvens));
 }
 
+function bygStudieSnapshot(katalog: Kort[], progress: BrugerProgress, now: Date): StudieSnapshot {
+  const states = Object.values(progress.kort);
+  const dag = hentDag(progress, tilDatoNøgle(now));
+  const kort = vælgKort(katalog, states, now);
+  const eksisterende = progress.kort[kort.id] ?? nyKorttilstand(kort.id, now);
+  const forhåndsState = planlægNæsteReview(kort.id, eksisterende, "correct", now);
+  const næsteKort = vælgKort(
+    katalog,
+    Object.values({
+      ...progress.kort,
+      [kort.id]: forhåndsState,
+    }),
+    now,
+  );
+
+  return {
+    kort,
+    næsteKort,
+    statistik: beregnStatistik(katalog, states, dag, now),
+  };
+}
+
+type ForberedtReview = {
+  snapshot: StudieSnapshot;
+  gem: () => Promise<void>;
+};
+
 function beregnStatistik(
   katalog: Kort[],
   states: Korttilstand[],
@@ -86,14 +113,7 @@ function beregnStatistik(
 export async function hentStudieSnapshot(userId: string): Promise<StudieSnapshot> {
   const now = new Date();
   const [katalog, progress] = await Promise.all([hentKatalog(), hentProgressRepository().hent(userId)]);
-  const states = Object.values(progress.kort);
-  const dag = hentDag(progress, tilDatoNøgle(now));
-  const kort = vælgKort(katalog, states, now);
-
-  return {
-    kort,
-    statistik: beregnStatistik(katalog, states, dag, now),
-  };
+  return bygStudieSnapshot(katalog, progress, now);
 }
 
 export async function hentStatistikOversigt(userId: string): Promise<StatistikOversigt> {
@@ -109,13 +129,14 @@ export async function hentStatistikOversigt(userId: string): Promise<StatistikOv
   };
 }
 
-export async function registrerReview(
+export async function forberedReview(
   userId: string,
   cardId: string,
   rating: ReviewRating,
-): Promise<StudieSnapshot> {
+): Promise<ForberedtReview> {
   const now = new Date();
-  const [katalog, progress] = await Promise.all([hentKatalog(), hentProgressRepository().hent(userId)]);
+  const repository = hentProgressRepository();
+  const [katalog, progress] = await Promise.all([hentKatalog(), repository.hent(userId)]);
   const kort = katalog.find((item) => item.id === cardId);
 
   if (!kort) {
@@ -135,16 +156,38 @@ export async function registrerReview(
     forkerte: dag.forkerte + (rating === "wrong" ? 1 : 0),
   };
 
-  await hentProgressRepository().gemReview(userId, næsteState, næsteDag, {
+  const event = {
     cardId,
     rating,
     reviewedAt: now.toISOString(),
     nextDueAt: næsteState.dueAt,
     forrigeKort,
     forrigeDag,
-  });
+  };
 
-  return hentStudieSnapshot(userId);
+  const snapshot = bygStudieSnapshot(
+    katalog,
+    {
+      kort: { ...progress.kort, [cardId]: næsteState },
+      dage: { ...progress.dage, [dato]: næsteDag },
+    },
+    now,
+  );
+
+  return {
+    snapshot,
+    gem: () => repository.gemReview(userId, næsteState, næsteDag, event),
+  };
+}
+
+export async function registrerReview(
+  userId: string,
+  cardId: string,
+  rating: ReviewRating,
+): Promise<StudieSnapshot> {
+  const review = await forberedReview(userId, cardId, rating);
+  await review.gem();
+  return review.snapshot;
 }
 
 export async function fortrydSidsteReview(userId: string): Promise<StudieSnapshot> {

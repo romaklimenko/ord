@@ -43,6 +43,7 @@ export type StudieStatistik = {
 
 export type StudieSnapshot = {
   kort: Kort;
+  næsteKort?: Kort;
   statistik: StudieStatistik;
 };
 

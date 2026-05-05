@@ -41,6 +41,17 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       setSender(true);
       setFejl(null);
       const reviewedKort = { cardId: kort.id, opslagsord: kort.opslagsord, rating };
+      const optimistiskKort = snapshot.næsteKort;
+
+      if (optimistiskKort) {
+        setSnapshot({
+          kort: optimistiskKort,
+          næsteKort: undefined,
+          statistik: opdaterOptimistiskStatistik(snapshot.statistik, rating),
+        });
+        setVist(false);
+        setSidsteReview(reviewedKort);
+      }
 
       try {
         const response = await fetch("/api/reviews", {
@@ -63,7 +74,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         setSender(false);
       }
     },
-    [kort.id, kort.opslagsord, sender],
+    [kort.id, kort.opslagsord, sender, snapshot.næsteKort, snapshot.statistik],
   );
 
   const fortrydReview = useCallback(async () => {
@@ -257,6 +268,15 @@ function oversætOrdklasse(ordklasse: string) {
   };
 
   return map[ordklasse] ?? ordklasse;
+}
+
+function opdaterOptimistiskStatistik(statistik: import("@/lib/types").StudieStatistik, rating: ReviewRating) {
+  return {
+    ...statistik,
+    svarIDag: statistik.svarIDag + 1,
+    rigtigeIDag: statistik.rigtigeIDag + (rating === "correct" ? 1 : 0),
+    forkerteIDag: statistik.forkerteIDag + (rating === "wrong" ? 1 : 0),
+  };
 }
 
 const afkortetSluttegn = /([…]|\.\.\.)\s*$/u;

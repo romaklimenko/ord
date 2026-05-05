@@ -4,12 +4,13 @@ import { createHash, randomUUID } from "node:crypto";
 import {
   AzureNamedKeyCredential,
   TableClient,
+  TableTransaction,
   type TableEntityResult,
 } from "@azure/data-tables";
 import { tilDatoNøgle } from "@/lib/date";
 import type { DagligStatistik, Korttilstand, ReviewRating } from "@/lib/types";
 
-type BrugerProgress = {
+export type BrugerProgress = {
   kort: Record<string, Korttilstand>;
   dage: Record<string, DagligStatistik>;
 };
@@ -205,8 +206,20 @@ class AzureProgressRepository implements ProgressRepository {
   }
 
   async hent(userId: string) {
-    await this.sikreTabel();
     const partitionKey = brugerPartition(userId);
+    try {
+      return await this.hentFraTabel(partitionKey);
+    } catch (error) {
+      if (!this.erTabelMangler(error)) {
+        throw error;
+      }
+
+      await this.sikreTabel();
+      return tomProgress();
+    }
+  }
+
+  private async hentFraTabel(partitionKey: string) {
     const progress = tomProgress();
     const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'card:' and RowKey lt 'card;'`;
 
@@ -249,12 +262,30 @@ class AzureProgressRepository implements ProgressRepository {
   }
 
   async gemReview(userId: string, state: Korttilstand, dag: DagligStatistik, event: ReviewEvent) {
-    await this.sikreTabel();
     const partitionKey = brugerPartition(userId);
+    try {
+      await this.gemReviewITabel(partitionKey, state, dag, event);
+    } catch (error) {
+      if (!this.erTabelMangler(error)) {
+        throw error;
+      }
+
+      await this.sikreTabel();
+      await this.gemReviewITabel(partitionKey, state, dag, event);
+    }
+  }
+
+  private async gemReviewITabel(
+    partitionKey: string,
+    state: Korttilstand,
+    dag: DagligStatistik,
+    event: ReviewEvent,
+  ) {
     const reverseTicks = String(Number.MAX_SAFE_INTEGER - Date.parse(event.reviewedAt)).padStart(16, "0");
     const eventId = randomUUID();
+    const transaction = new TableTransaction();
 
-    await this.client.upsertEntity(
+    transaction.upsertEntity(
       {
         partitionKey,
         rowKey: `card:${state.cardId}`,
@@ -270,7 +301,7 @@ class AzureProgressRepository implements ProgressRepository {
       "Replace",
     );
 
-    await this.client.upsertEntity(
+    transaction.upsertEntity(
       {
         partitionKey,
         rowKey: `day:${dag.dato}`,
@@ -281,7 +312,7 @@ class AzureProgressRepository implements ProgressRepository {
       "Replace",
     );
 
-    await this.client.upsertEntity(
+    transaction.upsertEntity(
       {
         partitionKey,
         rowKey: `evt:${reverseTicks}:${event.cardId}:${eventId}`,
@@ -294,11 +325,25 @@ class AzureProgressRepository implements ProgressRepository {
       },
       "Replace",
     );
+
+    await this.client.submitTransaction(transaction.actions);
   }
 
   async fortrydSidsteReview(userId: string): Promise<FortrydResultat | null> {
-    await this.sikreTabel();
     const partitionKey = brugerPartition(userId);
+    try {
+      return await this.fortrydSidsteReviewITabel(partitionKey);
+    } catch (error) {
+      if (!this.erTabelMangler(error)) {
+        throw error;
+      }
+
+      await this.sikreTabel();
+      return null;
+    }
+  }
+
+  private async fortrydSidsteReviewITabel(partitionKey: string): Promise<FortrydResultat | null> {
     const filter = `PartitionKey eq '${partitionKey}' and RowKey ge 'evt:' and RowKey lt 'evt;'`;
 
     let nyesteEvent:
@@ -397,6 +442,10 @@ class AzureProgressRepository implements ProgressRepository {
       }
     });
     return this.tableReady;
+  }
+
+  private erTabelMangler(error: unknown) {
+    return (error as { statusCode?: number }).statusCode === 404;
   }
 }
 

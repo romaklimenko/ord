@@ -198,6 +198,39 @@ describe("Træner", () => {
     );
   });
 
+  it("viser forhåndsvalgt næste kort før review-kaldet er færdigt", async () => {
+    let resolveFetch: (value: unknown) => void = () => {};
+    const fetchMock = vi.fn().mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve;
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <Træner
+        bruger={bruger}
+        førsteSnapshot={{
+          ...førsteSnapshot,
+          næsteKort: andetSnapshot.kort,
+        }}
+      />,
+    );
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{ArrowRight}");
+
+    expect(screen.getByText("vandtæt")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Vis svar" })).toBeInTheDocument();
+
+    resolveFetch({
+      ok: true,
+      json: async () => andetSnapshot,
+    });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+  });
+
   it("viser Fortryd-knappen efter et svar og kalder undo-endpointet ved klik", async () => {
     const fetchMock = vi
       .fn()

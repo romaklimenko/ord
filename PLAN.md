@@ -15,6 +15,7 @@
 - [x] Importer første lovlige ordliste.
 - [x] Implementer basisstatistik.
 - [x] Implementer Anki-lignende diagrammer.
+- [x] Optimer submit-svar-flowet.
 - [ ] Klargør hosting på `ord.klimenko.dk`.
 
 ## Næste anbefalede opgave
@@ -89,3 +90,4 @@ Følg trin-for-trin-planen i `DEPLOYMENT.md` for at oprette Azure Storage, Auth0
 - [x] Tilføj tests for SM-2-planlægning.
 - [x] Tilføj tests for hotkeys og feedbackflow.
 - [x] Tilføj deployment-dokumentation.
+- [x] Optimer submit-flowet med ét korts lookahead, øjeblikkelig UI-navigation og batch af Azure-skrivninger, mens review-kaldet gemmer i baggrunden.
