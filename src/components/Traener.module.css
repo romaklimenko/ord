@@ -38,25 +38,22 @@
 }
 
 .træner {
-  position: relative;
-  width: min(1400px, calc(100vw - 48px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(680px, calc(100vw - 48px));
   margin: 0 auto;
-  padding: 76px 0 32px;
+  padding: 32px 0;
 }
 
 .dagScore {
-  position: absolute;
-  top: 34px;
-  right: 0;
-  color: var(--tekst);
-  font-size: 1.7rem;
+  color: var(--sekundaer-tekst);
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
 .fortrydLinje {
-  position: absolute;
-  top: 38px;
-  left: 0;
+  margin-bottom: 16px;
 }
 
 .fortryd {
@@ -81,7 +78,7 @@
 
 .kort,
 .kortDetaljer {
-  width: min(100%, 1220px);
+  width: 100%;
   margin: 0;
   text-align: left;
 }
@@ -135,7 +132,6 @@
 }
 
 .forklaring {
-  max-width: 1200px;
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.55rem;
@@ -197,8 +193,8 @@
 .afsløring {
   display: flex;
   justify-content: center;
-  width: min(680px, 100%);
-  margin: 48px auto 0;
+  width: 100%;
+  margin: 48px 0 0;
 }
 
 .visSvar {
@@ -225,8 +221,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
-  width: min(680px, 100%);
-  margin: 48px auto 0;
+  width: 100%;
+  margin: 48px 0 0;
 }
 
 .feedback button {
@@ -273,14 +269,14 @@
 
 .bundlinje {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 24px;
+  gap: 8px;
   padding: 20px 28px 28px;
-  color: var(--tekst);
-  font-size: 1.15rem;
-  font-weight: 600;
+  color: var(--sekundaer-tekst);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
 }
 
 .bundlinje a {
@@ -293,9 +289,7 @@
 }
 
 .kilde {
-  color: var(--sekundaer-tekst);
-  font-size: 0.75em;
-  font-weight: 500;
+  font-size: 0.85em;
 }
 
 .bundlinje kbd {
@@ -316,13 +310,7 @@
   }
 
   .træner {
-    width: min(100% - 28px, 1400px);
-    padding-top: 44px;
-  }
-
-  .dagScore {
-    top: 16px;
-    font-size: 1.25rem;
+    width: min(100% - 28px, 680px);
   }
 
   .ordklasse {
@@ -341,11 +329,5 @@
 
   .feedback {
     grid-template-columns: 1fr;
-  }
-
-  .bundlinje {
-    align-items: flex-start;
-    flex-direction: column;
-    font-size: 1rem;
   }
 }

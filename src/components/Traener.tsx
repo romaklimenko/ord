@@ -129,6 +129,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
           Ord
         </Link>
         <nav className={styles.navigation} aria-label="Hovednavigation">
+          {!gæst ? <span className={styles.dagScore}>{snapshot.statistik.svarIDag} i dag</span> : null}
           {!gæst ? <Link href="/statistik">Statistik</Link> : null}
           {bruger.authAktiv ? (
             <a href="/auth/logout">Log ud</a>
@@ -141,8 +142,6 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       </header>
 
       <section className={styles.træner} aria-live="polite">
-        {!gæst ? <div className={styles.dagScore}>{snapshot.statistik.svarIDag}</div> : null}
-
         {sidsteReview && !vist && !gæst ? (
           <div className={styles.fortrydLinje}>
             <button
