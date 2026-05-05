@@ -16,6 +16,7 @@
 - [x] Implementer basisstatistik.
 - [x] Implementer Anki-lignende diagrammer.
 - [x] Optimer submit-svar-flowet.
+- [x] Ret optimistisk kortskift, så serverresponsen ikke erstatter det viste næste ord.
 - [ ] Klargør hosting på `ord.klimenko.dk`.
 
 ## Næste anbefalede opgave
@@ -74,6 +75,7 @@ Følg trin-for-trin-planen i `DEPLOYMENT.md` for at oprette Azure Storage, Auth0
 - [x] Vis svar-knap så mobile brugere uden tastatur kan afsløre kortet.
 - [x] Konsistent placering af opslagsordet, så det ikke hopper når kortet åbnes.
 - [x] Lad `Enter` fungere som "rigtigt" når kortet er afsløret, så streaks kan tastes som Enter-Enter-Enter.
+- [x] Behold det optimistisk viste næste kort, når review-kaldet svarer med et andet kort.
 - [x] Skel tydeligt mellem definition og eksempler.
 - [x] Vis altid et link til kilden, ikke kun ved afkortede definitioner.
 

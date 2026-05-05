@@ -52,6 +52,26 @@ const andetSnapshot: StudieSnapshot = {
   },
 };
 
+const tredjeSnapshot: StudieSnapshot = {
+  kort: {
+    id: "kort-3",
+    opslagsord: "kage",
+    ordklasse: "substantiv",
+    definition: "noget sødt",
+    eksempler: [],
+    kilde: "DanNet",
+  },
+  statistik: {
+    totalCards: 3,
+    setCards: 1,
+    modneCards: 0,
+    dueToday: 0,
+    svarIDag: 1,
+    rigtigeIDag: 1,
+    forkerteIDag: 0,
+  },
+};
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -229,6 +249,43 @@ describe("Træner", () => {
     });
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+  });
+
+  it("erstatter ikke det optimistiske kort når review-kaldet svarer", async () => {
+    let resolveFetch: (value: unknown) => void = () => {};
+    const fetchMock = vi.fn().mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve;
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <Træner
+        bruger={bruger}
+        førsteSnapshot={{
+          ...førsteSnapshot,
+          næsteKort: andetSnapshot.kort,
+        }}
+      />,
+    );
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{ArrowRight}");
+    await userEvent.keyboard("{Enter}");
+
+    expect(screen.getByText("vandtæt")).toBeInTheDocument();
+    expect(screen.getByText("som vand ikke kan trænge igennem")).toBeInTheDocument();
+
+    resolveFetch({
+      ok: true,
+      json: async () => tredjeSnapshot,
+    });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(screen.getByText("vandtæt")).toBeInTheDocument();
+    expect(screen.getByText("som vand ikke kan trænge igennem")).toBeInTheDocument();
+    expect(screen.queryByText("kage")).not.toBeInTheDocument();
   });
 
   it("viser Fortryd-knappen efter et svar og kalder undo-endpointet ved klik", async () => {

@@ -42,6 +42,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       setFejl(null);
       const reviewedKort = { cardId: kort.id, opslagsord: kort.opslagsord, rating };
       const optimistiskKort = snapshot.næsteKort;
+      const optimistiskKortId = optimistiskKort?.id;
 
       if (optimistiskKort) {
         setSnapshot({
@@ -65,8 +66,14 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         }
 
         const næsteSnapshot = (await response.json()) as StudieSnapshot;
-        setSnapshot(næsteSnapshot);
-        setVist(false);
+        if (optimistiskKortId) {
+          setSnapshot((aktuelSnapshot) =>
+            forenSnapshotEfterOptimistiskReview(aktuelSnapshot, næsteSnapshot, optimistiskKortId),
+          );
+        } else {
+          setSnapshot(næsteSnapshot);
+          setVist(false);
+        }
         setSidsteReview(reviewedKort);
       } catch (error) {
         setFejl(error instanceof Error ? error.message : "Der opstod en fejl.");
@@ -276,6 +283,22 @@ function opdaterOptimistiskStatistik(statistik: import("@/lib/types").StudieStat
     svarIDag: statistik.svarIDag + 1,
     rigtigeIDag: statistik.rigtigeIDag + (rating === "correct" ? 1 : 0),
     forkerteIDag: statistik.forkerteIDag + (rating === "wrong" ? 1 : 0),
+  };
+}
+
+function forenSnapshotEfterOptimistiskReview(
+  aktuelSnapshot: StudieSnapshot,
+  serverSnapshot: StudieSnapshot,
+  optimistiskKortId: string,
+) {
+  if (aktuelSnapshot.kort.id !== optimistiskKortId || serverSnapshot.kort.id === optimistiskKortId) {
+    return serverSnapshot;
+  }
+
+  return {
+    kort: aktuelSnapshot.kort,
+    næsteKort: serverSnapshot.kort,
+    statistik: serverSnapshot.statistik,
   };
 }
 
