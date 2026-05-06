@@ -66,10 +66,18 @@ export function vælgKort(katalog: Kort[], states: Korttilstand[], now: Date) {
   return vægtetTilfældigt(fallback, (kort) => frekvensVægt(kort.frekvens));
 }
 
-function bygStudieSnapshot(katalog: Kort[], progress: BrugerProgress, now: Date): StudieSnapshot {
+function bygStudieSnapshot(
+  katalog: Kort[],
+  progress: BrugerProgress,
+  now: Date,
+  tvungetKortId?: string,
+): StudieSnapshot {
   const states = Object.values(progress.kort);
   const dag = hentDag(progress, tilDatoNøgle(now));
-  const kort = vælgKort(katalog, states, now);
+  // Når et review er fortrudt, vil vi vise præcis det undone kort igen,
+  // i stedet for at lade vælgKort vælge et andet (potentielt mere overdue) kort.
+  const tvungetKort = tvungetKortId ? katalog.find((item) => item.id === tvungetKortId) : undefined;
+  const kort = tvungetKort ?? vælgKort(katalog, states, now);
   const eksisterende = progress.kort[kort.id] ?? nyKorttilstand(kort.id, now);
   const forhåndsState = planlægNæsteReview(kort.id, eksisterende, "correct", now);
   const næsteKort = vælgKort(
@@ -191,9 +199,12 @@ export async function registrerReview(
 }
 
 export async function fortrydSidsteReview(userId: string): Promise<StudieSnapshot> {
-  const resultat = await hentProgressRepository().fortrydSidsteReview(userId);
+  const repository = hentProgressRepository();
+  const resultat = await repository.fortrydSidsteReview(userId);
   if (!resultat) {
     throw new Error("Intet review at fortryde.");
   }
-  return hentStudieSnapshot(userId);
+  const now = new Date();
+  const [katalog, progress] = await Promise.all([hentKatalog(), repository.hent(userId)]);
+  return bygStudieSnapshot(katalog, progress, now, resultat.cardId);
 }

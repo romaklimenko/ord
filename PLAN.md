@@ -17,11 +17,12 @@
 - [x] Implementer Anki-lignende diagrammer.
 - [x] Optimer submit-svar-flowet.
 - [x] Ret optimistisk kortskift, så serverresponsen ikke erstatter det viste næste ord.
-- [ ] Klargør hosting på `ord.klimenko.dk`.
+- [x] Ret Fortryd-flowet, så det undone kort altid vises igen, optimistisk fejlrul tilbageføres, og keydown ikke kan dobbeltaffyre i samme JS-task.
+- [x] Klargør hosting på `ord.klimenko.dk`.
 
 ## Næste anbefalede opgave
 
-Følg trin-for-trin-planen i `DEPLOYMENT.md` for at oprette Azure Storage, Auth0, Vercel-projekt og custom domain. Kræver kun cloud-konsol-arbejde; ingen kodeændringer.
+Ingen blokerende opgave. Tag fat i en af de åbne ideer i `DRAFT.md` eller en af de resterende dataopgaver (fx kontakt DSL om DDO-dækning).
 
 ## Beslutninger
 

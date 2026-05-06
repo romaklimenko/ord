@@ -5,6 +5,7 @@ DRAFT.md
 .next/
 next-env.d.ts
 node_modules/
+tsconfig.tsbuildinfo
 public/katalog/v1/
 .ord-dev/
 coverage/

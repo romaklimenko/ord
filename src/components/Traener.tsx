@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { AktuelBruger } from "@/lib/session";
 import { erGæst } from "@/lib/session";
@@ -25,6 +25,9 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
   const [sender, setSender] = useState(false);
   const [fejl, setFejl] = useState<string | null>(null);
   const [sidsteReview, setSidsteReview] = useState<SidsteReview | null>(null);
+  // Synkron lås, så to keydown-events i samme JS-task ikke begge slipper igennem
+  // sender-checket. setSender(true) er asynkron; useRef-værdien er ikke.
+  const senderLås = useRef(false);
 
   const kort = snapshot.kort;
   const gæst = erGæst(bruger);
@@ -34,15 +37,18 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
 
   const sendReview = useCallback(
     async (rating: ReviewRating) => {
-      if (sender) {
+      if (senderLås.current) {
         return;
       }
+      senderLås.current = true;
 
       setSender(true);
       setFejl(null);
       const reviewedKort = { cardId: kort.id, opslagsord: kort.opslagsord, rating };
       const optimistiskKort = snapshot.næsteKort;
       const optimistiskKortId = optimistiskKort?.id;
+      const tidligereSnapshot = snapshot;
+      const tidligereSidsteReview = sidsteReview;
 
       if (optimistiskKort) {
         setSnapshot({
@@ -76,18 +82,27 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         }
         setSidsteReview(reviewedKort);
       } catch (error) {
+        // Rul den optimistiske opdatering tilbage, så Fortryd-knappen ikke peger
+        // på et review, som serveren aldrig nåede at gemme.
+        if (optimistiskKort) {
+          setSnapshot(tidligereSnapshot);
+          setSidsteReview(tidligereSidsteReview);
+          setVist(true);
+        }
         setFejl(error instanceof Error ? error.message : "Der opstod en fejl.");
       } finally {
+        senderLås.current = false;
         setSender(false);
       }
     },
-    [kort.id, kort.opslagsord, sender, snapshot.næsteKort, snapshot.statistik],
+    [kort.id, kort.opslagsord, sidsteReview, snapshot],
   );
 
   const fortrydReview = useCallback(async () => {
-    if (sender || !sidsteReview) {
+    if (senderLås.current || !sidsteReview) {
       return;
     }
+    senderLås.current = true;
 
     setSender(true);
     setFejl(null);
@@ -104,9 +119,10 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
     } catch (error) {
       setFejl(error instanceof Error ? error.message : "Der opstod en fejl.");
     } finally {
+      senderLås.current = false;
       setSender(false);
     }
-  }, [sender, sidsteReview]);
+  }, [sidsteReview]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
