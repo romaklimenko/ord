@@ -1,9 +1,17 @@
 .side {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: 100vh;
+  /* minmax(0, 1fr) i stedet for 1fr: ellers vil indholdets auto-min-størrelse
+     gøre at en lang definition kan presse hele sektionen ud over viewport-
+     højden. minmax(0, 1fr) låser sektionen til den ledige plads. */
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* Lås den ydre layout til viewport-højden, så definitionen — ikke siden —
+     bliver det eneste, der scroller, og ord, knapper og footer ikke flytter
+     sig når kortet åbnes. dvh tager højde for mobile chrome (URL-bar). */
+  height: 100vh;
+  height: 100dvh;
   background: var(--flade);
+  overflow: hidden;
 }
 
 .toplinje {
@@ -38,12 +46,15 @@
 }
 
 .træner {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  /* Eksplicitte rækker, så ordet, knapperne og fejl-linjen ankrer fast,
+     og kun definitionen vokser/scroller mellem dem.
+     Rækker: fortryd · ord · definition (1fr) · knapper · fejl */
+  display: grid;
+  grid-template-rows: 2.5rem auto minmax(0, 1fr) auto auto;
+  height: 100%;
   width: min(680px, calc(100vw - 48px));
   margin: 0 auto;
-  padding: 48px 0;
+  padding: 32px 0;
 }
 
 .dagScore {
@@ -53,7 +64,11 @@
 }
 
 .fortrydLinje {
-  margin-bottom: 16px;
+  /* Reservér altid samme højde, uanset om Fortryd-knappen er synlig, så
+     ordet ikke hopper ned/op når Fortryd dukker op eller forsvinder. */
+  grid-row: 1;
+  align-self: start;
+  min-height: 2.25rem;
 }
 
 .fortryd {
@@ -76,8 +91,9 @@
   opacity: 0.6;
 }
 
-.kort,
-.kortDetaljer {
+.kort {
+  grid-row: 2;
+  align-self: start;
   width: 100%;
   margin: 0;
   text-align: left;
@@ -91,8 +107,7 @@
   font-weight: 600;
 }
 
-.kort h1,
-.kortDetaljer h1 {
+.kort h1 {
   margin: 0;
   max-width: 100%;
   font-family: Georgia, "Times New Roman", serif;
@@ -105,9 +120,18 @@
 }
 
 .definition {
-  margin-top: 36px;
+  /* Eneste flader, der må scrolle. Topgrænsen er rækkens 1fr, så ord
+     og knapper holder sig på plads selv ved meget lange definitioner. */
+  grid-row: 3;
+  max-height: 100%;
+  overflow-y: auto;
+  margin: 36px 0 0;
   padding-top: 28px;
   border-top: 1px solid var(--linje);
+}
+
+.definitionTomt {
+  grid-row: 3;
 }
 
 .maerkat {
@@ -191,10 +215,11 @@
 }
 
 .afsløring {
+  grid-row: 4;
   display: flex;
   justify-content: center;
   width: 100%;
-  margin: 48px 0 0;
+  margin: 16px 0 0;
 }
 
 .visSvar {
@@ -218,11 +243,12 @@
 }
 
 .feedback {
+  grid-row: 4;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   width: 100%;
-  margin: 48px 0 0;
+  margin: 16px 0 0;
 }
 
 .feedback button {
@@ -262,7 +288,8 @@
 }
 
 .fejl {
-  margin: 20px 0 0;
+  grid-row: 5;
+  margin: 12px 0 0;
   color: var(--forkert);
   font-weight: 700;
 }
@@ -288,6 +315,15 @@
   margin: 0;
 }
 
+/* Sidste afsnit i bundlinjen er tastatur-hintet. Det skifter længde, når
+   kortet åbnes (kort: "Tryk Enter", åbent: "Brug ←/↓/1 …"), så vi reservér
+   et stabilt højde-vindue for at undgå at footeren — og dermed ord/knapper
+   over den — flytter sig mellem de to tilstande. 3.2em rummer to linjer på
+   selv smalle mobiler. */
+.bundlinje p:last-child {
+  min-height: 3.2em;
+}
+
 .kilde {
   font-size: 0.85em;
 }
@@ -311,14 +347,15 @@
 
   .træner {
     width: min(100% - 28px, 680px);
+    padding: 20px 0;
+    grid-template-rows: 2.25rem auto minmax(0, 1fr) auto auto;
   }
 
   .ordklasse {
     font-size: 1.2rem;
   }
 
-  .kort h1,
-  .kortDetaljer h1 {
+  .kort h1 {
     font-size: min(var(--ord-stoerrelse), 4rem);
     overflow-wrap: anywhere;
   }

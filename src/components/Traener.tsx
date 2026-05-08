@@ -181,8 +181,8 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
       </header>
 
       <section className={styles.træner} aria-live="polite">
-        {sidsteReview && !vist && !gæst ? (
-          <div className={styles.fortrydLinje}>
+        <div className={styles.fortrydLinje}>
+          {sidsteReview && !vist && !gæst ? (
             <button
               type="button"
               className={styles.fortryd}
@@ -192,31 +192,33 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
             >
               Fortryd sidste svar ({sidsteReview.opslagsord})
             </button>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
 
-        <article className={vist ? styles.kortDetaljer : styles.kort}>
+        <article className={styles.kort}>
           <p className={styles.ordklasse}>{oversætOrdklasse(kort.ordklasse)}</p>
           <h1 style={ordStil}>{kort.opslagsord}</h1>
-
-          {vist ? (
-            <div className={styles.definition}>
-              {renderFrekvensMaerkat(kort)}
-              <p className={styles.forklaring}>{renderDefinition(kort)}</p>
-              {kort.eksempler.length > 0 ? (
-                <div className={styles.eksempler}>
-                  <p className={styles.eksemplerLabel}>Eksempler</p>
-                  <ul>
-                    {kort.eksempler.slice(0, 2).map((eksempel) => (
-                      <li key={eksempel}>{eksempel}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              {renderKildelink(kort)}
-            </div>
-          ) : null}
         </article>
+
+        {vist ? (
+          <div className={styles.definition}>
+            {renderFrekvensMaerkat(kort)}
+            <p className={styles.forklaring}>{renderDefinition(kort)}</p>
+            {kort.eksempler.length > 0 ? (
+              <div className={styles.eksempler}>
+                <p className={styles.eksemplerLabel}>Eksempler</p>
+                <ul>
+                  {kort.eksempler.slice(0, 2).map((eksempel) => (
+                    <li key={eksempel}>{eksempel}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {renderKildelink(kort)}
+          </div>
+        ) : (
+          <div className={styles.definitionTomt} aria-hidden="true" />
+        )}
 
         {vist ? (
           <div className={styles.feedback}>
