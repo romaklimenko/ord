@@ -129,6 +129,91 @@
   background: var(--forkert);
 }
 
+.korpusSøjler {
+  display: grid;
+  grid-template-columns: repeat(30, minmax(0, 1fr));
+  align-items: end;
+  gap: 8px;
+  height: 240px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.korpusSøjler li {
+  display: flex;
+  align-items: end;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.korpusSøjle {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--linje);
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.tomDag {
+  /* Tom plads for dage uden snapshot — bevarer den vandrette gitterposition */
+  visibility: hidden;
+}
+
+.modne,
+.set,
+.tilRep,
+.uset {
+  display: block;
+  width: 100%;
+}
+
+.modne {
+  background: #0e7c3a;
+}
+
+.set {
+  background: #f5c518;
+}
+
+.tilRep {
+  background: #f08000;
+}
+
+.uset {
+  background: #c8102e;
+}
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--sekundaer-tekst);
+  font-size: 0.85rem;
+}
+
+.legende li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendePrik {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--linje);
+  border-radius: 2px;
+}
+
 @media (max-width: 760px) {
   .sektionTop {
     align-items: start;
@@ -142,5 +227,10 @@
 
   .søjler li > span {
     display: none;
+  }
+
+  .korpusSøjler {
+    gap: 4px;
+    height: 200px;
   }
 }

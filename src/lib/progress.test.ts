@@ -65,6 +65,56 @@ describe("FilProgressRepository.fortrydSidsteReview", () => {
     expect(await repo.fortrydSidsteReview("user-2")).toBeNull();
   });
 
+  it("bevarer korpus-snapshot-felterne på dag-rækken", async () => {
+    const repo = hentProgressRepository();
+    const stateEfter = {
+      cardId: "kort-9",
+      repetitions: 1,
+      easeFactor: 2.6,
+      intervalDays: 1,
+      dueAt: "2026-05-05T10:00:00.000Z",
+      lastReviewedAt: "2026-05-04T10:00:00.000Z",
+      seen: 1,
+      correct: 1,
+      wrong: 0,
+    };
+
+    await repo.gemReview(
+      "user-snapshot",
+      stateEfter,
+      {
+        dato: "20260504",
+        svar: 1,
+        rigtige: 1,
+        forkerte: 0,
+        kortIAlt: 100,
+        setCards: 12,
+        modneCards: 3,
+        tilRepetition: 4,
+      },
+      {
+        cardId: "kort-9",
+        rating: "correct",
+        reviewedAt: "2026-05-04T10:00:00.000Z",
+        nextDueAt: stateEfter.dueAt,
+        forrigeKort: null,
+        forrigeDag: null,
+      },
+    );
+
+    const efter = await repo.hent("user-snapshot");
+    expect(efter.dage["20260504"]).toEqual({
+      dato: "20260504",
+      svar: 1,
+      rigtige: 1,
+      forkerte: 0,
+      kortIAlt: 100,
+      setCards: 12,
+      modneCards: 3,
+      tilRepetition: 4,
+    });
+  });
+
   it("gendanner præcis tidligere tilstand når kortet allerede var set", async () => {
     const repo = hentProgressRepository();
 

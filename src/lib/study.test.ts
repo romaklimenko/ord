@@ -1,5 +1,8 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { vælgKort } from "@/lib/study";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import os from "node:os";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { forberedReview, vælgKort } from "@/lib/study";
 import type { Kort, Korttilstand } from "@/lib/types";
 
 function kort(id: string, opslagsord: string, frekvens?: number): Kort {
@@ -34,6 +37,44 @@ function tilstand(
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe("forberedReview", () => {
+  let arbejdsmappe: string;
+  let originalCwd: string;
+
+  beforeEach(async () => {
+    originalCwd = process.cwd();
+    arbejdsmappe = await fs.mkdtemp(path.join(os.tmpdir(), "ord-study-test-"));
+    process.chdir(arbejdsmappe);
+  });
+
+  afterEach(async () => {
+    process.chdir(originalCwd);
+    await fs.rm(arbejdsmappe, { recursive: true, force: true });
+    vi.restoreAllMocks();
+  });
+
+  it("gemmer korpus-snapshot på dagen efter et review", async () => {
+    // Brug et kortspecifikt id fra demoKort-fallback (ingen manifest i test).
+    const review = await forberedReview("snapshot-user", "demo-derudenfor", "correct");
+    await review.gem();
+
+    const { hentProgressRepository } = await import("@/lib/progress");
+    const efter = await hentProgressRepository().hent("snapshot-user");
+    const dage = Object.values(efter.dage);
+    expect(dage).toHaveLength(1);
+    const dag = dage[0];
+    // Demokataloget har 4 kort. Efter ét review er præcis ét kort set.
+    expect(dag.kortIAlt).toBe(4);
+    expect(dag.setCards).toBe(1);
+    // Et nyt kort er ikke modent (intervalDays < 21).
+    expect(dag.modneCards).toBe(0);
+    // Det reviewede kort er ikke længere due (intervalDays >= 1 efter correct).
+    expect(dag.tilRepetition).toBe(0);
+    expect(dag.svar).toBe(1);
+    expect(dag.rigtige).toBe(1);
+  });
 });
 
 describe("vælgKort", () => {

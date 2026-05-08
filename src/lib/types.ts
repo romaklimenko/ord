@@ -29,6 +29,16 @@ export type DagligStatistik = {
   svar: number;
   rigtige: number;
   forkerte: number;
+  // Snapshot af korpus-tilstanden ved sidste review den dag. Felterne er
+  // valgfri, fordi gamle dag-rækker fra før funktionen ikke har dem — de
+  // vises som en tom kolonne i det stablede diagram.
+  kortIAlt?: number;
+  setCards?: number;
+  modneCards?: number;
+  // Antal kort, der er due AND NOT modne. Defineret som disjoint fra
+  // modneCards, så de fire diagramsegmenter (modne, set−modne−tilRep,
+  // tilRepetition, unseen) summer til kortIAlt uden overlap.
+  tilRepetition?: number;
 };
 
 export type StudieStatistik = {

@@ -180,6 +180,10 @@ type DagEntity = {
   svar: number;
   rigtige: number;
   forkerte: number;
+  kortIAlt?: number;
+  setCards?: number;
+  modneCards?: number;
+  tilRepetition?: number;
 };
 
 class AzureProgressRepository implements ProgressRepository {
@@ -255,6 +259,10 @@ class AzureProgressRepository implements ProgressRepository {
         svar: Number(entity.svar ?? 0),
         rigtige: Number(entity.rigtige ?? 0),
         forkerte: Number(entity.forkerte ?? 0),
+        kortIAlt: entity.kortIAlt != null ? Number(entity.kortIAlt) : undefined,
+        setCards: entity.setCards != null ? Number(entity.setCards) : undefined,
+        modneCards: entity.modneCards != null ? Number(entity.modneCards) : undefined,
+        tilRepetition: entity.tilRepetition != null ? Number(entity.tilRepetition) : undefined,
       };
     }
 
@@ -308,6 +316,10 @@ class AzureProgressRepository implements ProgressRepository {
         svar: dag.svar,
         rigtige: dag.rigtige,
         forkerte: dag.forkerte,
+        kortIAlt: dag.kortIAlt,
+        setCards: dag.setCards,
+        modneCards: dag.modneCards,
+        tilRepetition: dag.tilRepetition,
       },
       "Replace",
     );
@@ -412,6 +424,10 @@ class AzureProgressRepository implements ProgressRepository {
           svar: forrigeDag.svar,
           rigtige: forrigeDag.rigtige,
           forkerte: forrigeDag.forkerte,
+          kortIAlt: forrigeDag.kortIAlt,
+          setCards: forrigeDag.setCards,
+          modneCards: forrigeDag.modneCards,
+          tilRepetition: forrigeDag.tilRepetition,
         },
         "Replace",
       );

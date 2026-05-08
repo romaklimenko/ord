@@ -166,11 +166,18 @@ export async function forberedReview(
   const dato = tilDatoNøgle(now);
   const forrigeDag = progress.dage[dato] ?? null;
   const dag = hentDag(progress, dato);
+  const efterReviewStates = Object.values({ ...progress.kort, [cardId]: næsteState });
+  const modneCards = efterReviewStates.filter(erModent).length;
+  const tilRepetition = efterReviewStates.filter((s) => erDue(s, now) && !erModent(s)).length;
   const næsteDag = {
     dato,
     svar: dag.svar + 1,
     rigtige: dag.rigtige + (rating === "correct" ? 1 : 0),
     forkerte: dag.forkerte + (rating === "wrong" ? 1 : 0),
+    kortIAlt: katalog.length,
+    setCards: efterReviewStates.filter((s) => s.seen > 0).length,
+    modneCards,
+    tilRepetition,
   };
 
   const event = {

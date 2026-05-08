@@ -24,6 +24,7 @@
 - [x] QA-runde: tilføj `1` som genvej for forkert og `2` som genvej for rigtigt (oveni de eksisterende pile- og Enter-genveje).
 - [x] QA-runde: ret CSS-selektoren i statistikken, så `display: none` på mobil kun rammer datolabelen og ikke selve søjlesegmenterne (rigtige/forkerte spans). Tidligere skjulte den hele diagrammet på mobil.
 - [x] QA-runde: spring storage-kaldet over for gæster i `hentStudieSnapshot`, og fjern den ubrugte `Auth0Provider`-klientwrapper fra rod-layout for at gøre first-paint hurtigere på Vercel cold start.
+- [x] Tilføj korpus-snapshot pr. dag (kortIAlt, setCards, modneCards, tilRepetition) på `day:`-rækken og vis et stablet søjlediagram med modne (grøn), set (gul), til repetition (orange) og ikke-set (Dannebrog-rød) i statistikken.
 
 ## Næste anbefalede opgave
 

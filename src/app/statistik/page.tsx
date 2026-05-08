@@ -83,6 +83,61 @@ export default async function StatistikSide() {
             })}
           </ol>
         </section>
+
+        <section className={styles.diagram} aria-labelledby="korpus-fordeling">
+          <div className={styles.sektionTop}>
+            <h2 id="korpus-fordeling">Korpus pr. dag</h2>
+            <ul className={styles.legende}>
+              <li>
+                <span className={`${styles.legendePrik} ${styles.modne}`} aria-hidden="true" />
+                Modne
+              </li>
+              <li>
+                <span className={`${styles.legendePrik} ${styles.set}`} aria-hidden="true" />
+                Set
+              </li>
+              <li>
+                <span className={`${styles.legendePrik} ${styles.tilRep}`} aria-hidden="true" />
+                Til repetition
+              </li>
+              <li>
+                <span className={`${styles.legendePrik} ${styles.uset}`} aria-hidden="true" />
+                Ikke set
+              </li>
+            </ul>
+          </div>
+          <ol className={styles.korpusSøjler}>
+            {dage.map((dag) => {
+              const harSnapshot = typeof dag.kortIAlt === "number" && dag.kortIAlt > 0;
+              if (!harSnapshot) {
+                return <li key={dag.dato} className={styles.tomDag} aria-hidden="true" />;
+              }
+              const kortIAlt = dag.kortIAlt ?? 0;
+              const setCards = dag.setCards ?? 0;
+              const modne = dag.modneCards ?? 0;
+              const tilRep = dag.tilRepetition ?? 0;
+              // Yellow = set − modne − tilRep. Disjoint segmenter, så summen
+              // altid er kortIAlt.
+              const setAndet = Math.max(0, setCards - modne - tilRep);
+              const uset = Math.max(0, kortIAlt - modne - setAndet - tilRep);
+              const procent = (n: number) => (n / kortIAlt) * 100;
+
+              return (
+                <li
+                  key={dag.dato}
+                  title={`${dag.dato}: ${modne} modne, ${setAndet} set, ${tilRep} til repetition, ${uset} ikke set`}
+                >
+                  <div className={styles.korpusSøjle}>
+                    <span className={styles.uset} style={{ height: `${procent(uset)}%` }} />
+                    <span className={styles.tilRep} style={{ height: `${procent(tilRep)}%` }} />
+                    <span className={styles.set} style={{ height: `${procent(setAndet)}%` }} />
+                    <span className={styles.modne} style={{ height: `${procent(modne)}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
       </section>
     </main>
   );
