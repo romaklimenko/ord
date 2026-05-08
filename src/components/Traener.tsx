@@ -415,11 +415,11 @@ function beregnOrdStørrelse(ord: string) {
   const mål = Math.max(længsteDel, Math.round(samletLængde * 0.7));
 
   if (mål <= 6) {
-    return 9;
+    return 8;
   }
 
   if (mål <= 9) {
-    return 8;
+    return 7;
   }
 
   if (mål <= 13) {
