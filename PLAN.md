@@ -19,6 +19,11 @@
 - [x] Ret optimistisk kortskift, så serverresponsen ikke erstatter det viste næste ord.
 - [x] Ret Fortryd-flowet, så det undone kort altid vises igen, optimistisk fejlrul tilbageføres, og keydown ikke kan dobbeltaffyre i samme JS-task.
 - [x] Klargør hosting på `ord.klimenko.dk`.
+- [x] QA-runde: stabiliser opslagsordets position, så det ikke hopper når kortet åbnes (ankret til toppen i stedet for vertikalt centreret).
+- [x] QA-runde: byt knap-rækkefølgen på mobil, så grøn (Rigtigt) ligger over rød (Forkert), mens desktop fortsat viser grøn til højre.
+- [x] QA-runde: tilføj `1` som genvej for forkert og `2` som genvej for rigtigt (oveni de eksisterende pile- og Enter-genveje).
+- [x] QA-runde: ret CSS-selektoren i statistikken, så `display: none` på mobil kun rammer datolabelen og ikke selve søjlesegmenterne (rigtige/forkerte spans). Tidligere skjulte den hele diagrammet på mobil.
+- [x] QA-runde: spring storage-kaldet over for gæster i `hentStudieSnapshot`, og fjern den ubrugte `Auth0Provider`-klientwrapper fra rod-layout for at gøre first-paint hurtigere på Vercel cold start.
 
 ## Næste anbefalede opgave
 

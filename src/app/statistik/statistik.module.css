@@ -140,7 +140,7 @@
     height: 180px;
   }
 
-  .søjler li span {
+  .søjler li > span {
     display: none;
   }
 }

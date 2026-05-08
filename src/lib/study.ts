@@ -118,8 +118,17 @@ function beregnStatistik(
   };
 }
 
-export async function hentStudieSnapshot(userId: string): Promise<StudieSnapshot> {
+export async function hentStudieSnapshot(
+  userId: string,
+  options: { gæst?: boolean } = {},
+): Promise<StudieSnapshot> {
   const now = new Date();
+  // Gæster har ingen gemt progression, så vi springer storage-kaldet over.
+  // Det giver et hurtigere first-paint på Vercel cold start.
+  if (options.gæst) {
+    const katalog = await hentKatalog();
+    return bygStudieSnapshot(katalog, { kort: {}, dage: {} }, now);
+  }
   const [katalog, progress] = await Promise.all([hentKatalog(), hentProgressRepository().hent(userId)]);
   return bygStudieSnapshot(katalog, progress, now);
 }

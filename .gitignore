@@ -9,3 +9,4 @@ tsconfig.tsbuildinfo
 public/katalog/v1/
 .ord-dev/
 coverage/
+.playwright-mcp/*

@@ -341,4 +341,48 @@ describe("Træner", () => {
       }),
     );
   });
+
+  it("sender korrekt svar med 2-tasten", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => andetSnapshot,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<Træner bruger={bruger} førsteSnapshot={førsteSnapshot} />);
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("2");
+
+    await waitFor(() => expect(screen.getByText("vandtæt")).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/reviews",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ cardId: "kort-1", rating: "correct" }),
+      }),
+    );
+  });
+
+  it("sender forkert svar med 1-tasten", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => andetSnapshot,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<Træner bruger={bruger} førsteSnapshot={førsteSnapshot} />);
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("1");
+
+    await waitFor(() => expect(screen.getByText("vandtæt")).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/reviews",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ cardId: "kort-1", rating: "wrong" }),
+      }),
+    );
+  });
 });

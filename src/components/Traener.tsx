@@ -140,13 +140,18 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         return;
       }
 
-      if (event.key === "Enter" || event.key === "ArrowRight" || event.key === "ArrowUp") {
+      if (
+        event.key === "Enter" ||
+        event.key === "ArrowRight" ||
+        event.key === "ArrowUp" ||
+        event.key === "2"
+      ) {
         event.preventDefault();
         void sendReview("correct");
         return;
       }
 
-      if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+      if (event.key === "ArrowLeft" || event.key === "ArrowDown" || event.key === "1") {
         event.preventDefault();
         void sendReview("wrong");
       }
@@ -268,8 +273,8 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         <p>
           {vist ? (
             <>
-              Brug <kbd>←</kbd> eller <kbd>↓</kbd> for forkert, <kbd>→</kbd>, <kbd>↑</kbd> eller{" "}
-              <kbd>Enter</kbd> for rigtigt.
+              Brug <kbd>←</kbd>, <kbd>↓</kbd> eller <kbd>1</kbd> for forkert,{" "}
+              <kbd>→</kbd>, <kbd>↑</kbd>, <kbd>2</kbd> eller <kbd>Enter</kbd> for rigtigt.
             </>
           ) : (
             <>
