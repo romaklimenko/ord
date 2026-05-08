@@ -37,6 +37,11 @@ export function erAfkortetDefinition(definition) {
 }
 
 export function erUegnetSomFlashcard(form) {
+  // Enkeltbogstavs-former ("a", "b", "ø") fungerer ikke som flashcards og
+  // skyldes oftest ontologi- eller forkortelseslækager fra DanNet.
+  if (form.trim().length <= 1) {
+    return true;
+  }
   // Bundne morfemer: præfikser/suffikser som "anti-" eller "-agtig".
   if (form.startsWith("-") || form.endsWith("-")) {
     return true;

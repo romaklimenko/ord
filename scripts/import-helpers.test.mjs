@@ -78,6 +78,12 @@ describe("erUegnetSomFlashcard", () => {
     expect(erUegnetSomFlashcard("vandtæt")).toBe(false);
   });
 
+  it("kasserer enkeltbogstavs-former", () => {
+    expect(erUegnetSomFlashcard("a")).toBe(true);
+    expect(erUegnetSomFlashcard("ø")).toBe(true);
+    expect(erUegnetSomFlashcard(" b ")).toBe(true);
+  });
+
   it("kasserer rene tal", () => {
     expect(erUegnetSomFlashcard("117")).toBe(true);
     expect(erUegnetSomFlashcard("0")).toBe(true);
