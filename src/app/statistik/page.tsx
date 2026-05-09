@@ -109,9 +109,6 @@ export default async function StatistikSide() {
           <ol className={styles.korpusSøjler}>
             {dage.map((dag) => {
               const harSnapshot = typeof dag.kortIAlt === "number" && dag.kortIAlt > 0;
-              if (!harSnapshot) {
-                return <li key={dag.dato} className={styles.tomDag} aria-hidden="true" />;
-              }
               const kortIAlt = dag.kortIAlt ?? 0;
               const setCards = dag.setCards ?? 0;
               const modne = dag.modneCards ?? 0;
@@ -120,19 +117,24 @@ export default async function StatistikSide() {
               // altid er kortIAlt.
               const setAndet = Math.max(0, setCards - modne - tilRep);
               const uset = Math.max(0, kortIAlt - modne - setAndet - tilRep);
-              const procent = (n: number) => (n / kortIAlt) * 100;
+              const procent = (n: number) => (kortIAlt > 0 ? (n / kortIAlt) * 100 : 0);
+              const titel = harSnapshot
+                ? `${dag.dato}: ${modne} modne, ${setAndet} set, ${tilRep} til repetition, ${uset} ikke set`
+                : `${dag.dato}: intet snapshot`;
 
               return (
-                <li
-                  key={dag.dato}
-                  title={`${dag.dato}: ${modne} modne, ${setAndet} set, ${tilRep} til repetition, ${uset} ikke set`}
-                >
+                <li key={dag.dato} title={titel}>
                   <div className={styles.korpusSøjle}>
-                    <span className={styles.uset} style={{ height: `${procent(uset)}%` }} />
-                    <span className={styles.tilRep} style={{ height: `${procent(tilRep)}%` }} />
-                    <span className={styles.set} style={{ height: `${procent(setAndet)}%` }} />
-                    <span className={styles.modne} style={{ height: `${procent(modne)}%` }} />
+                    {harSnapshot ? (
+                      <>
+                        <span className={styles.uset} style={{ height: `${procent(uset)}%` }} />
+                        <span className={styles.tilRep} style={{ height: `${procent(tilRep)}%` }} />
+                        <span className={styles.set} style={{ height: `${procent(setAndet)}%` }} />
+                        <span className={styles.modne} style={{ height: `${procent(modne)}%` }} />
+                      </>
+                    ) : null}
                   </div>
+                  <span>{dag.dato.slice(6, 8)}</span>
                 </li>
               );
             })}
