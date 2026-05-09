@@ -396,16 +396,32 @@ function renderFrekvensMaerkat(kort: import("@/lib/types").Kort) {
 }
 
 function renderKildelink(kort: import("@/lib/types").Kort) {
-  const url = kildeUrl(kort);
-  if (!url) {
+  const links: { url: string; label: string }[] = [];
+  if (kort.synsetId) {
+    links.push({
+      url: `https://wordnet.dk/dannet/data/${encodeURIComponent(kort.synsetId)}`,
+      label: "Se hos DanNet",
+    });
+  }
+  if (kort.opslagsord) {
+    links.push({
+      url: `https://ordnet.dk/ddo/ordbog?query=${encodeURIComponent(kort.opslagsord)}`,
+      label: "Slå op i DDO",
+    });
+  }
+  if (links.length === 0) {
     return null;
   }
-  const label = kort.synsetId ? "Se hos DanNet" : "Slå op i DDO";
   return (
     <p className={styles.kildelink}>
-      <a href={url} rel="noreferrer" target="_blank">
-        {label} →
-      </a>
+      {links.map((link, indeks) => (
+        <span key={link.url}>
+          {indeks > 0 ? " · " : null}
+          <a href={link.url} rel="noreferrer" target="_blank">
+            {link.label} →
+          </a>
+        </span>
+      ))}
     </p>
   );
 }
