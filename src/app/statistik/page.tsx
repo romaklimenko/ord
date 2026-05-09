@@ -2,9 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { erGæst, hentAktuelBruger } from "@/lib/session";
 import { hentStatistikOversigt } from "@/lib/study";
+import type { DagligStatistik } from "@/lib/types";
 import styles from "./statistik.module.css";
 
 export const dynamic = "force-dynamic";
+
+type Variant = "kompakt" | "fuld";
 
 export default async function StatistikSide() {
   const bruger = await hentAktuelBruger();
@@ -12,7 +15,7 @@ export default async function StatistikSide() {
     redirect("/auth/login");
   }
   const { statistik, dage } = await hentStatistikOversigt(bruger.id);
-  const maxSvar = Math.max(1, ...dage.map((dag) => dag.svar));
+  const dage30 = dage.slice(-30);
 
   return (
     <main className={styles.side}>
@@ -54,91 +57,141 @@ export default async function StatistikSide() {
           </div>
         </dl>
 
-        <section className={styles.diagram} aria-labelledby="daglig-aktivitet">
-          <div className={styles.sektionTop}>
-            <h2 id="daglig-aktivitet">Seneste 365 dage</h2>
-            <p>
-              {statistik.rigtigeIDag} rigtige og {statistik.forkerteIDag} forkerte i dag
-            </p>
-          </div>
-          <ol className={styles.søjler}>
-            {dage.map((dag) => {
-              const søjleHøjde = Math.max(2, Math.round((dag.svar / maxSvar) * 100));
-              const rigtigeAndel = dag.svar > 0 ? Math.round((dag.rigtige / dag.svar) * 100) : 0;
-              const forkerteAndel = dag.svar > 0 ? 100 - rigtigeAndel : 0;
+        <AktivitetDiagram
+          id="aktivitet-30"
+          titel="Seneste 30 dage"
+          dage={dage30}
+          variant="kompakt"
+          undertekst={`${statistik.rigtigeIDag} rigtige og ${statistik.forkerteIDag} forkerte i dag`}
+        />
 
-              return (
-                <li key={dag.dato}>
-                  <div
-                    className={styles.søjle}
-                    style={{ height: `${søjleHøjde}%` }}
-                    title={`${dag.dato}: ${dag.svar} svar, ${dag.rigtige} rigtige, ${dag.forkerte} forkerte`}
-                  >
-                    <span className={styles.rigtige} style={{ height: `${rigtigeAndel}%` }} />
-                    <span className={styles.forkerte} style={{ height: `${forkerteAndel}%` }} />
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </section>
+        <KorpusDiagram id="korpus-30" titel="Korpus, seneste 30 dage" dage={dage30} variant="kompakt" />
 
-        <section className={styles.diagram} aria-labelledby="korpus-fordeling">
-          <div className={styles.sektionTop}>
-            <h2 id="korpus-fordeling">Korpus pr. dag</h2>
-            <ul className={styles.legende}>
-              <li>
-                <span className={`${styles.legendePrik} ${styles.modne}`} aria-hidden="true" />
-                Modne
-              </li>
-              <li>
-                <span className={`${styles.legendePrik} ${styles.set}`} aria-hidden="true" />
-                Set
-              </li>
-              <li>
-                <span className={`${styles.legendePrik} ${styles.tilRep}`} aria-hidden="true" />
-                Til repetition
-              </li>
-              <li>
-                <span className={`${styles.legendePrik} ${styles.uset}`} aria-hidden="true" />
-                Ikke set
-              </li>
-            </ul>
-          </div>
-          <ol className={styles.korpusSøjler}>
-            {dage.map((dag) => {
-              const harSnapshot = typeof dag.kortIAlt === "number" && dag.kortIAlt > 0;
-              const kortIAlt = dag.kortIAlt ?? 0;
-              const setCards = dag.setCards ?? 0;
-              const modne = dag.modneCards ?? 0;
-              const tilRep = dag.tilRepetition ?? 0;
-              // Yellow = set − modne − tilRep. Disjoint segmenter, så summen
-              // altid er kortIAlt.
-              const setAndet = Math.max(0, setCards - modne - tilRep);
-              const uset = Math.max(0, kortIAlt - modne - setAndet - tilRep);
-              const procent = (n: number) => (kortIAlt > 0 ? (n / kortIAlt) * 100 : 0);
-              const titel = harSnapshot
-                ? `${dag.dato}: ${modne} modne, ${setAndet} set, ${tilRep} til repetition, ${uset} ikke set`
-                : `${dag.dato}: intet snapshot`;
+        <AktivitetDiagram id="aktivitet-365" titel="Seneste 365 dage" dage={dage} variant="fuld" />
 
-              return (
-                <li key={dag.dato} title={titel}>
-                  <div className={styles.korpusSøjle}>
-                    {harSnapshot ? (
-                      <>
-                        <span className={styles.uset} style={{ height: `${procent(uset)}%` }} />
-                        <span className={styles.tilRep} style={{ height: `${procent(tilRep)}%` }} />
-                        <span className={styles.set} style={{ height: `${procent(setAndet)}%` }} />
-                        <span className={styles.modne} style={{ height: `${procent(modne)}%` }} />
-                      </>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </section>
+        <KorpusDiagram id="korpus-365" titel="Korpus, seneste 365 dage" dage={dage} variant="fuld" />
       </section>
     </main>
+  );
+}
+
+function AktivitetDiagram({
+  id,
+  titel,
+  dage,
+  variant,
+  undertekst,
+}: {
+  id: string;
+  titel: string;
+  dage: DagligStatistik[];
+  variant: Variant;
+  undertekst?: string;
+}) {
+  const maxSvar = Math.max(1, ...dage.map((dag) => dag.svar));
+  const minHøjde = variant === "kompakt" ? 4 : 2;
+  const containerClass = variant === "kompakt" ? styles.søjlerKompakt : styles.søjlerFuld;
+
+  return (
+    <section className={styles.diagram} aria-labelledby={id}>
+      <div className={styles.sektionTop}>
+        <h2 id={id}>{titel}</h2>
+        {undertekst ? <p>{undertekst}</p> : null}
+      </div>
+      <ol className={containerClass}>
+        {dage.map((dag) => {
+          const søjleHøjde = Math.max(minHøjde, Math.round((dag.svar / maxSvar) * 100));
+          const rigtigeAndel = dag.svar > 0 ? Math.round((dag.rigtige / dag.svar) * 100) : 0;
+          const forkerteAndel = dag.svar > 0 ? 100 - rigtigeAndel : 0;
+
+          return (
+            <li key={dag.dato}>
+              <div
+                className={styles.søjle}
+                style={{ height: `${søjleHøjde}%` }}
+                title={`${dag.dato}: ${dag.svar} svar, ${dag.rigtige} rigtige, ${dag.forkerte} forkerte`}
+              >
+                <span className={styles.rigtige} style={{ height: `${rigtigeAndel}%` }} />
+                <span className={styles.forkerte} style={{ height: `${forkerteAndel}%` }} />
+              </div>
+              {variant === "kompakt" ? <span>{dag.dato.slice(6, 8)}</span> : null}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
+function KorpusDiagram({
+  id,
+  titel,
+  dage,
+  variant,
+}: {
+  id: string;
+  titel: string;
+  dage: DagligStatistik[];
+  variant: Variant;
+}) {
+  const containerClass = variant === "kompakt" ? styles.korpusSøjlerKompakt : styles.korpusSøjlerFuld;
+
+  return (
+    <section className={styles.diagram} aria-labelledby={id}>
+      <div className={styles.sektionTop}>
+        <h2 id={id}>{titel}</h2>
+        <ul className={styles.legende}>
+          <li>
+            <span className={`${styles.legendePrik} ${styles.modne}`} aria-hidden="true" />
+            Modne
+          </li>
+          <li>
+            <span className={`${styles.legendePrik} ${styles.set}`} aria-hidden="true" />
+            Set
+          </li>
+          <li>
+            <span className={`${styles.legendePrik} ${styles.tilRep}`} aria-hidden="true" />
+            Til repetition
+          </li>
+          <li>
+            <span className={`${styles.legendePrik} ${styles.uset}`} aria-hidden="true" />
+            Ikke set
+          </li>
+        </ul>
+      </div>
+      <ol className={containerClass}>
+        {dage.map((dag) => {
+          const harSnapshot = typeof dag.kortIAlt === "number" && dag.kortIAlt > 0;
+          const kortIAlt = dag.kortIAlt ?? 0;
+          const setCards = dag.setCards ?? 0;
+          const modne = dag.modneCards ?? 0;
+          const tilRep = dag.tilRepetition ?? 0;
+          // Yellow = set − modne − tilRep. Disjoint segmenter, så summen
+          // altid er kortIAlt.
+          const setAndet = Math.max(0, setCards - modne - tilRep);
+          const uset = Math.max(0, kortIAlt - modne - setAndet - tilRep);
+          const procent = (n: number) => (kortIAlt > 0 ? (n / kortIAlt) * 100 : 0);
+          const titel = harSnapshot
+            ? `${dag.dato}: ${modne} modne, ${setAndet} set, ${tilRep} til repetition, ${uset} ikke set`
+            : `${dag.dato}: intet snapshot`;
+
+          return (
+            <li key={dag.dato} title={titel}>
+              <div className={styles.korpusSøjle}>
+                {harSnapshot ? (
+                  <>
+                    <span className={styles.uset} style={{ height: `${procent(uset)}%` }} />
+                    <span className={styles.tilRep} style={{ height: `${procent(tilRep)}%` }} />
+                    <span className={styles.set} style={{ height: `${procent(setAndet)}%` }} />
+                    <span className={styles.modne} style={{ height: `${procent(modne)}%` }} />
+                  </>
+                ) : null}
+              </div>
+              {variant === "kompakt" ? <span>{dag.dato.slice(6, 8)}</span> : null}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }

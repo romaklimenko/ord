@@ -83,18 +83,39 @@
   color: var(--sekundaer-tekst);
 }
 
-.søjler {
+.søjlerKompakt,
+.søjlerFuld {
   display: grid;
-  grid-template-columns: repeat(365, minmax(0, 1fr));
   grid-auto-rows: 1fr;
-  gap: 1px;
   height: 240px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.søjler li {
+.søjlerKompakt {
+  grid-template-columns: repeat(30, minmax(8px, 1fr));
+  gap: 8px;
+}
+
+.søjlerFuld {
+  grid-template-columns: repeat(365, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.søjlerKompakt li {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: end;
+  gap: 8px;
+  min-width: 0;
+  height: 100%;
+  text-align: center;
+  color: var(--sekundaer-tekst);
+  font-size: 0.75rem;
+}
+
+.søjlerFuld li {
   display: flex;
   align-items: end;
   min-width: 0;
@@ -107,6 +128,11 @@
   width: 100%;
   min-height: 2px;
   background: #fafafa;
+}
+
+.søjlerKompakt .søjle {
+  min-height: 4px;
+  border: 1px solid var(--linje);
 }
 
 .rigtige,
@@ -123,18 +149,42 @@
   background: var(--forkert);
 }
 
-.korpusSøjler {
+.korpusSøjlerKompakt,
+.korpusSøjlerFuld {
   display: grid;
-  grid-template-columns: repeat(365, minmax(0, 1fr));
   align-items: end;
-  gap: 1px;
   height: 240px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.korpusSøjler li {
+.korpusSøjlerKompakt {
+  grid-template-columns: repeat(30, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.korpusSøjlerFuld {
+  grid-template-columns: repeat(365, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.korpusSøjlerKompakt li {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: end;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+  color: var(--sekundaer-tekst);
+  font-size: 0.75rem;
+}
+
+.korpusSøjlerFuld li {
   display: flex;
   align-items: end;
   width: 100%;
@@ -151,6 +201,10 @@
   height: 100%;
   background: #fafafa;
   overflow: hidden;
+}
+
+.korpusSøjlerKompakt .korpusSøjle {
+  border: 1px solid var(--linje);
 }
 
 .modne,
@@ -208,13 +262,29 @@
     flex-direction: column;
   }
 
-  .søjler {
-    gap: 0;
+  .søjlerKompakt {
+    gap: 4px;
     height: 180px;
   }
 
-  .korpusSøjler {
-    gap: 0;
+  .søjlerKompakt li > span {
+    display: none;
+  }
+
+  .søjlerFuld {
+    height: 160px;
+  }
+
+  .korpusSøjlerKompakt {
+    gap: 4px;
     height: 200px;
+  }
+
+  .korpusSøjlerKompakt li > span {
+    display: none;
+  }
+
+  .korpusSøjlerFuld {
+    height: 180px;
   }
 }
