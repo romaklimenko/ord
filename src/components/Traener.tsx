@@ -415,24 +415,24 @@ function beregnOrdStørrelse(ord: string) {
   const mål = Math.max(længsteDel, Math.round(samletLængde * 0.7));
 
   if (mål <= 6) {
-    return 8;
+    return 6.2;
   }
 
   if (mål <= 9) {
-    return 7;
+    return 5.6;
   }
 
   if (mål <= 13) {
-    return 6.8;
+    return 5;
   }
 
   if (mål <= 17) {
-    return 5.4;
+    return 4.4;
   }
 
   if (mål <= 23) {
-    return 4.2;
+    return 3.6;
   }
 
-  return 3.4;
+  return 3;
 }

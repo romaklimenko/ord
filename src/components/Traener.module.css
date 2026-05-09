@@ -19,7 +19,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 16px 28px;
+  padding: 12px 28px;
   border-bottom: 1px solid var(--linje);
   color: var(--sekundaer-tekst);
 }
@@ -50,11 +50,11 @@
      og kun definitionen vokser/scroller mellem dem.
      Rækker: fortryd · ord · definition (1fr) · knapper · fejl */
   display: grid;
-  grid-template-rows: 2.5rem auto minmax(0, 1fr) auto auto;
+  grid-template-rows: 2rem auto minmax(0, 1fr) auto auto;
   height: 100%;
   width: min(680px, calc(100vw - 48px));
   margin: 0 auto;
-  padding: 32px 0;
+  padding: 16px 0;
 }
 
 .dagScore {
@@ -68,7 +68,7 @@
      ordet ikke hopper ned/op når Fortryd dukker op eller forsvinder. */
   grid-row: 1;
   align-self: start;
-  min-height: 2.25rem;
+  min-height: 1.85rem;
 }
 
 .fortryd {
@@ -100,9 +100,9 @@
 }
 
 .ordklasse {
-  margin: 0 0 8px;
+  margin: 0 0 2px;
   color: var(--tekst);
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-style: italic;
   font-weight: 600;
 }
@@ -125,8 +125,8 @@
   grid-row: 3;
   max-height: 100%;
   overflow-y: auto;
-  margin: 36px 0 0;
-  padding-top: 28px;
+  margin: 20px 0 0;
+  padding-top: 16px;
   border-top: 1px solid var(--linje);
 }
 
@@ -136,7 +136,7 @@
 
 .maerkat {
   display: inline-block;
-  margin: 0 0 16px;
+  margin: 0 0 10px;
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 0.72rem;
@@ -173,8 +173,8 @@
 }
 
 .eksempler {
-  margin-top: 32px;
-  padding-top: 20px;
+  margin-top: 22px;
+  padding-top: 16px;
   border-top: 1px dashed var(--linje);
   color: var(--sekundaer-tekst);
 }
@@ -200,7 +200,7 @@
 }
 
 .kildelink {
-  margin: 28px 0 0;
+  margin: 20px 0 0;
   font-size: 0.85rem;
 }
 
@@ -219,12 +219,12 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin: 16px 0 0;
+  margin: 12px 0 0;
 }
 
 .visSvar {
   width: 100%;
-  min-height: 64px;
+  min-height: 56px;
   border: 1px solid var(--linje-staerk);
   border-radius: 4px;
   background: var(--flade);
@@ -248,11 +248,11 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   width: 100%;
-  margin: 16px 0 0;
+  margin: 12px 0 0;
 }
 
 .feedback button {
-  min-height: 64px;
+  min-height: 56px;
   border: 1px solid var(--linje-staerk);
   border-radius: 4px;
   background: var(--flade);
@@ -298,8 +298,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 20px 28px 28px;
+  gap: 4px;
+  padding: 12px 28px 16px;
   color: var(--sekundaer-tekst);
   font-size: 0.85rem;
   font-weight: 500;
@@ -347,8 +347,8 @@
 
   .træner {
     width: min(100% - 28px, 680px);
-    padding: 20px 0;
-    grid-template-rows: 2.25rem auto minmax(0, 1fr) auto auto;
+    padding: 12px 0;
+    grid-template-rows: 1.85rem auto minmax(0, 1fr) auto auto;
   }
 
   .ordklasse {
