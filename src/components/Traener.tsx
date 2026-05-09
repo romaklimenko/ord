@@ -169,6 +169,12 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
         </Link>
         <nav className={styles.navigation} aria-label="Hovednavigation">
           {!gæst ? <span className={styles.dagScore}>{snapshot.statistik.svarIDag} i dag</span> : null}
+          {!gæst ? (
+            <span className={styles.korpusStats}>
+              {snapshot.statistik.totalCards} ord, {snapshot.statistik.modneCards} modne,{" "}
+              {snapshot.statistik.setCards} set, {snapshot.statistik.dueToday} skal øves
+            </span>
+          ) : null}
           {!gæst ? <Link href="/statistik">Statistik</Link> : null}
           {bruger.authAktiv ? (
             <a href="/auth/logout">Log ud</a>
@@ -259,12 +265,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
           <p>
             Du prøver appen som gæst — svar gemmes ikke. <a href="/auth/login">Log ind</a> for at gemme progression.
           </p>
-        ) : (
-          <p>
-            {snapshot.statistik.totalCards} ord i alt, {snapshot.statistik.modneCards} modne,{" "}
-            {snapshot.statistik.setCards} set, {snapshot.statistik.dueToday} skal øves i dag.
-          </p>
-        )}
+        ) : null}
         <p className={styles.kilde}>
           Data:{" "}
           <a href="https://wordnet.dk/dannet/data" rel="noreferrer" target="_blank">

@@ -63,12 +63,18 @@
   font-weight: 600;
 }
 
+.korpusStats {
+  color: var(--sekundaer-tekst);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
 .fortrydLinje {
   /* Reservér altid samme højde, uanset om Fortryd-knappen er synlig, så
      ordet ikke hopper ned/op når Fortryd dukker op eller forsvinder. */
   grid-row: 1;
   align-self: start;
-  min-height: 1.85rem;
+  min-height: 2.5rem;
 }
 
 .fortryd {
@@ -100,7 +106,7 @@
 }
 
 .ordklasse {
-  margin: 0 0 2px;
+  margin: 8px 0 6px;
   color: var(--tekst);
   font-size: 1.25rem;
   font-style: italic;
@@ -299,7 +305,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 12px 28px 16px;
+  padding: 12px 28px 8px;
   color: var(--sekundaer-tekst);
   font-size: 0.85rem;
   font-weight: 500;
@@ -343,6 +349,10 @@
   .toplinje,
   .bundlinje {
     padding-inline: 18px;
+  }
+
+  .korpusStats {
+    display: none;
   }
 
   .træner {
