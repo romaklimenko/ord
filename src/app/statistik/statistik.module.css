@@ -85,9 +85,9 @@
 
 .søjler {
   display: grid;
-  grid-template-columns: repeat(30, minmax(8px, 1fr));
+  grid-template-columns: repeat(365, minmax(0, 1fr));
   grid-auto-rows: 1fr;
-  gap: 8px;
+  gap: 1px;
   height: 240px;
   margin: 0;
   padding: 0;
@@ -95,23 +95,17 @@
 }
 
 .søjler li {
-  display: grid;
-  grid-template-rows: 1fr auto;
+  display: flex;
   align-items: end;
-  gap: 8px;
   min-width: 0;
   height: 100%;
-  text-align: center;
-  color: var(--sekundaer-tekst);
-  font-size: 0.75rem;
 }
 
 .søjle {
   display: flex;
   flex-direction: column-reverse;
   width: 100%;
-  min-height: 4px;
-  border: 1px solid var(--linje);
+  min-height: 2px;
   background: #fafafa;
 }
 
@@ -131,9 +125,9 @@
 
 .korpusSøjler {
   display: grid;
-  grid-template-columns: repeat(30, minmax(0, 1fr));
+  grid-template-columns: repeat(365, minmax(0, 1fr));
   align-items: end;
-  gap: 8px;
+  gap: 1px;
   height: 240px;
   margin: 0;
   padding: 0;
@@ -141,18 +135,13 @@
 }
 
 .korpusSøjler li {
-  display: grid;
-  grid-template-rows: 1fr auto;
+  display: flex;
   align-items: end;
-  gap: 8px;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  text-align: center;
-  color: var(--sekundaer-tekst);
-  font-size: 0.75rem;
 }
 
 .korpusSøjle {
@@ -160,7 +149,6 @@
   flex-direction: column-reverse;
   width: 100%;
   height: 100%;
-  border: 1px solid var(--linje);
   background: #fafafa;
   overflow: hidden;
 }
@@ -221,16 +209,12 @@
   }
 
   .søjler {
-    gap: 4px;
+    gap: 0;
     height: 180px;
   }
 
-  .søjler li > span {
-    display: none;
-  }
-
   .korpusSøjler {
-    gap: 4px;
+    gap: 0;
     height: 200px;
   }
 }

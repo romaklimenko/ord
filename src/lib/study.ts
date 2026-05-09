@@ -138,7 +138,7 @@ export async function hentStatistikOversigt(userId: string): Promise<StatistikOv
   const [katalog, progress] = await Promise.all([hentKatalog(), hentProgressRepository().hent(userId)]);
   const states = Object.values(progress.kort);
   const dag = hentDag(progress, tilDatoNøgle(now));
-  const dage = senesteDatoNøgler(30, now).map((dato) => hentDag(progress, dato));
+  const dage = senesteDatoNøgler(365, now).map((dato) => hentDag(progress, dato));
 
   return {
     statistik: beregnStatistik(katalog, states, dag, now),

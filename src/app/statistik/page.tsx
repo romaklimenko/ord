@@ -56,14 +56,14 @@ export default async function StatistikSide() {
 
         <section className={styles.diagram} aria-labelledby="daglig-aktivitet">
           <div className={styles.sektionTop}>
-            <h2 id="daglig-aktivitet">Seneste 30 dage</h2>
+            <h2 id="daglig-aktivitet">Seneste 365 dage</h2>
             <p>
               {statistik.rigtigeIDag} rigtige og {statistik.forkerteIDag} forkerte i dag
             </p>
           </div>
           <ol className={styles.søjler}>
             {dage.map((dag) => {
-              const søjleHøjde = Math.max(4, Math.round((dag.svar / maxSvar) * 100));
+              const søjleHøjde = Math.max(2, Math.round((dag.svar / maxSvar) * 100));
               const rigtigeAndel = dag.svar > 0 ? Math.round((dag.rigtige / dag.svar) * 100) : 0;
               const forkerteAndel = dag.svar > 0 ? 100 - rigtigeAndel : 0;
 
@@ -77,7 +77,6 @@ export default async function StatistikSide() {
                     <span className={styles.rigtige} style={{ height: `${rigtigeAndel}%` }} />
                     <span className={styles.forkerte} style={{ height: `${forkerteAndel}%` }} />
                   </div>
-                  <span>{dag.dato.slice(6, 8)}</span>
                 </li>
               );
             })}
@@ -134,7 +133,6 @@ export default async function StatistikSide() {
                       </>
                     ) : null}
                   </div>
-                  <span>{dag.dato.slice(6, 8)}</span>
                 </li>
               );
             })}
