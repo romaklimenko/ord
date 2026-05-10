@@ -273,7 +273,7 @@ export function Træner({ bruger, førsteSnapshot }: Props) {
           </a>
           , Center for Sprogteknologi/KU og DSL (CC BY-SA 4.0)
         </p>
-        <p>
+        <p className={styles.tastaturHint}>
           {vist ? (
             <>
               Brug <kbd>←</kbd>, <kbd>↓</kbd> eller <kbd>1</kbd> for forkert,{" "}

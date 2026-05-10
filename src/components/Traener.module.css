@@ -321,13 +321,21 @@
   margin: 0;
 }
 
-/* Sidste afsnit i bundlinjen er tastatur-hintet. Det skifter længde, når
-   kortet åbnes (kort: "Tryk Enter", åbent: "Brug ←/↓/1 …"), så vi reservér
-   et stabilt højde-vindue for at undgå at footeren — og dermed ord/knapper
-   over den — flytter sig mellem de to tilstande. 3.2em rummer to linjer på
-   selv smalle mobiler. */
-.bundlinje p:last-child {
+/* Tastatur-hintet skifter længde, når kortet åbnes (kort: "Tryk Enter",
+   åbent: "Brug ←/↓/1 …"), så vi reservér et stabilt højde-vindue for at
+   undgå at footeren — og dermed ord/knapper over den — flytter sig mellem
+   de to tilstande. 3.2em rummer to linjer på selv smalle mobiler. */
+.tastaturHint {
   min-height: 3.2em;
+}
+
+/* Skjul tastatur-hintet på rene touch-enheder, hvor genvejene ikke giver
+   mening. Vi rammer kun enheder uden hover og med grov peger, så en
+   desktop-bruger med smalt vindue stadig ser hintet. */
+@media (hover: none) and (pointer: coarse) {
+  .tastaturHint {
+    display: none;
+  }
 }
 
 .kilde {
