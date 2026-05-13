@@ -28,6 +28,7 @@
 - [x] Lås træner-layoutet: konvertér `.træner` til grid (fortryd · ord · definition · knapper · fejl), lås `.side` til `100dvh` og lad kun `.definition` scrolle. Ord, knapper og footer holder samme pixel-position uanset om kortet er åbnet, og lange definitioner scroller mellem dem i stedet for at skubbe layoutet.
 - [x] Opdater app-ikonet til Dannebrog-rød og hvid med et tydeligere `O`-motiv.
 - [x] Reducer review-latency: pin server-routes og pages til `fra1` (tæt på Azure Storage), og slå `card:`- og `day:`-listEntities sammen til ét kald i `hentFraTabel`.
+- [x] Tilføj Vercel Analytics (`@vercel/analytics`) i rod-layoutet for at tælle besøgende og sidevisninger.
 
 ## Næste anbefalede opgave
 
