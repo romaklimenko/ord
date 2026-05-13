@@ -3,6 +3,7 @@ import { erGæst, hentAktuelBruger } from "@/lib/session";
 import { hentStudieSnapshot } from "@/lib/study";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "fra1";
 
 export default async function Forside() {
   const bruger = await hentAktuelBruger();

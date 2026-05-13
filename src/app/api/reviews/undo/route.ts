@@ -3,6 +3,7 @@ import { erGæst, hentAktuelBruger } from "@/lib/session";
 import { fortrydSidsteReview, hentStudieSnapshot } from "@/lib/study";
 
 export const runtime = "nodejs";
+export const preferredRegion = "fra1";
 
 export async function POST() {
   const bruger = await hentAktuelBruger();

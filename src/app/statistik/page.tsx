@@ -6,6 +6,7 @@ import type { DagligStatistik } from "@/lib/types";
 import styles from "./statistik.module.css";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "fra1";
 
 type Variant = "kompakt" | "fuld";
 

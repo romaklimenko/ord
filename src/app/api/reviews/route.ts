@@ -4,6 +4,9 @@ import { forberedReview, hentStudieSnapshot } from "@/lib/study";
 import type { ReviewRating } from "@/lib/types";
 
 export const runtime = "nodejs";
+// Kør funktionen tæt på Azure Table Storage (Europa) i stedet for default
+// iad1 (US East). Sparer ~80-140ms pr. round-trip mod storage.
+export const preferredRegion = "fra1";
 
 function erRating(value: unknown): value is ReviewRating {
   return value === "wrong" || value === "correct";
